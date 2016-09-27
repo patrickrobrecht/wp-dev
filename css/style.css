@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+h2{clear:both;margin-top:2em;}
+
+table{border-collapse:collapse;clear:both;}
+tr:nth-child(2n){background:#ddd;}
+th,td{padding:.7em;vertical-align:top;}
+
+a,a:hover,a:focus{color:#000;text-decoration:none;}
+
+.chart{width:300px;height:320px;float:left;}
+
+.latest{background:#46b450 !important;}
+.old{background:#f1adad !important;}
+.missing{background:#dc3232 !important;}
+.latest a,.old a,.missing{color:#fff;}

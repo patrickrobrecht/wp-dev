@@ -1,0 +1,4 @@
+.settings/
+data/plugins/*.json
+data/plugins-stats/*.json
+data/plugins-translations/*.json

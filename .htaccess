@@ -1,0 +1,86 @@
+# .htaccess for wp-dev.patrick-robrecht.de
+
+# DOMAIN AND SUBDOMAIN REWRITE
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /
+	RewriteCond %{HTTPS} off
+	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# SET MIME TYPES according to file extension
+<IfModule mod_mime.c>
+	AddType application/json .json
+	AddType text/css .css
+	AddType text/csv .csv
+	AddType text/html .html .htm .php
+	AddType text/javascript	.js
+</IfModule>
+	
+# SET EXPIRES HEADERS
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access plus 1 week"
+	
+	# CSS and Javascript
+	ExpiresByType text/css "access plus 1 year"	
+	ExpiresByType text/javascript "access plus 1 year"
+	
+	# HTML documents, Feeds
+	ExpiresByType text/html "access plus 0 seconds"
+	
+	# Data
+	ExpiresByType application/json "access plus 2 seconds"
+</IfModule>
+
+# SET HEADERS FOR CACHING / SECURITY
+<IfModule mod_headers.c>
+	# SET HEADERS FOR CACHING
+	Header always unset ETag
+	FileETag None
+	Header append Vary Accept-Encoding
+	Header always unset Cache-Control
+	Header merge Cache-Control "public, must-revalidate, proxy-revalidate"
+	
+	# SET HEADERS FOR SECURITY
+	# enforce browsers to use HTTPS
+	Header always set Strict-Transport-Security "max-age=63072000; preload"
+	
+	# disallow the website to be framed
+	Header always set X-Frame-Options "deny"
+	
+	# enable XSS protection filters
+	Header always set X-XSS-Protection "1; mode=block"
+	
+	# whitelist sources of approve content which prevents the browser from loading malicious assets
+#	Header set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+	Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+	
+	# force browsers to stick to the declared content-type
+	Header always set X-Content-Type-Options "nosniff"
+	
+	# public key pins - generated with https://report-uri.io/home/pkp_hash
+	Header always set Public-Key-Pins "pin-sha256=\"AxTxBy2j8Kg4/hP0t+l/XARLnkEZYhwSiVfH2103hjg=\"; pin-sha256=\"YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg=\"; pin-sha256=\"grX4Ta9HpZx6tSHkmCrvpApTQGo67CYDnvprLg5yRME=\"; pin-sha256=\"Vjs8r4z+80wjNcr1YKepWQboSIRi63WsWXhIMN+eWys=\"; max-age=2592000;"
+	
+	# Remove sever information (this does not always work)
+	Header set Server ""
+	Header always unset Server
+	
+	# Remove PHP version etc.
+	Header set X-Powered-By ""
+	Header always unset X-Powered-By
+	
+	# Remove some WordPress specific headers
+	Header always unset X-Pingback
+	Header always unset WP-Super-Cache
+</IfModule>
+
+# ENABLE GZIP COMPRESSION
+<IfModule mod_deflate.c>
+	SetOutputFilter DEFLATE
+	AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+
+# DISABLE THE SERVER SIGNATURE
+	ServerSignature Off
