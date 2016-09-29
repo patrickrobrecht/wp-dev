@@ -4,12 +4,20 @@
 	} else {
 		$fresh_plugin = '';
 	}
+	
+	if ( isset( $_GET['plugins'] ) ) {
+		$regex = '@([a-z]|[0-9]|-|,)+@s';
+		$plugins_test = strtolower( $_GET['plugins'] );
+		if ( preg_match( $regex, $plugins_test ) ) {
+			$plugins = explode( ',', $plugins_test );
+		}
+	}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>WordPress translations</title>
+	<title>WordPress plugins and their translations</title>
 	<link rel="stylesheet" href="css/theme.default.css">
 	<link rel="stylesheet" href="css/style.css">
 	<script src="js/jquery.min.js"></script>
@@ -57,7 +65,7 @@
 				<th scope="col">Author</th>
 				<th scope="col">Contributors</th>
 				<th scope="col">Latest version</th>
-				<th scope="col">Versions</th>
+				<th scope="col" colspan="2">Version Stats</th>
 				<th scope="col">Support</th>
 				<th scope="col" colspan="3">Development</th>
 				<th scope="col" colspan="2">Translations</th>
@@ -72,6 +80,11 @@
 				$trac_url = sprintf( 'https://plugins.trac.wordpress.org/browser/%s/', $plugin );
 				$development_log_rss_url = sprintf( 'https://plugins.trac.wordpress.org/log/%s?limit=100&mode=stop_on_copy&format=rss', $plugin );
 				$translations_url = sprintf( 'https://translate.wordpress.org/projects/wp-plugins/%s', $plugin );
+				
+				$latest_version = $plugins_data[ $plugin ]->version;
+				$latest_version_array = explode( '.', $latest_version );
+				$latest_version_2 = $latest_version_array[0] . '.' . $latest_version_array[1];
+				$latest_version_2_stats = $plugins_stats[ $plugin ]->$latest_version_2;
 			?>
 			<tr>
 				<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
@@ -80,8 +93,15 @@
 						foreach ( $contributors as $contributor_name => $wordpress_profile_url ) { ?>
 					<a href="<?php echo $wordpress_profile_url; ?>"><?php echo $contributor_name; ?></a>	
 					<?php } ?></td>
-				<td><a href="<?php echo $plugins_data[ $plugin ]->download_link; ?>"><?php echo $plugins_data[ $plugin ]->version; ?></a></td>
-				<td><a href="#chart-<?php echo $plugin; ?>">Stats</a></td>
+				<td><a href="<?php echo $plugins_data[ $plugin ]->download_link; ?>"><?php echo $latest_version; ?></a></td>
+				<td><?php if ( $latest_version_2_stats ) {
+							echo sprintf(
+									'%.2f %% on %s.x',
+									$plugins_stats[ $plugin ]->$latest_version_2,
+									$latest_version_2
+							);
+					}?>
+				<td><a href="#chart-<?php echo $plugin; ?>">Stats &darr;</a></td>
 				
 				<td><a href="<?php echo $support_url; ?>">Support forum</a></td>
 				<td><a href="<?php echo $svn_url; ?>">SVN</a>
@@ -89,7 +109,7 @@
 				<td><a href="<?php echo $development_log_rss_url; ?>">Log RSS</a></td>
 				
 				<td><a href="<?php echo $translations_url; ?>">Translate</a></td>
-				<td><a href="#translations-<?php echo $plugin; ?>">Translations</a></td>
+				<td><a href="#translations-<?php echo $plugin; ?>">Translations &darr;</a></td>
 				
 				<td><a href="?update=<?php echo $plugin; ?>">Refresh cache</td>
 			</tr>
