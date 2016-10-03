@@ -84,3 +84,23 @@
 
 # DISABLE THE SERVER SIGNATURE
 	ServerSignature Off
+
+# DISALLOW ACCESS TO PRIVATE FILES
+<files config.php>
+	<IfModule mod_authz_core.c>
+	    Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+    	Order allow,deny
+    	Deny from all
+	</IfModule>
+</files>
+<files functions.php>
+	<IfModule mod_authz_core.c>
+	    Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+    	Order allow,deny
+    	Deny from all
+	</IfModule>
+</files>	

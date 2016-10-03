@@ -1,4 +1,5 @@
 <?php
+	include_once 'config.php';
 	include_once 'functions.php';
 
 	// Update local cache with the latest data from the WordPress API.

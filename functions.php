@@ -1,15 +1,4 @@
 <?php
-// Configuration.
-
-	// List of plugins.
-	$plugins = array(
-			'extended-evaluation-for-statify',
-			'posts-and-users-stats',
-			'statify',
-	);
-	sort( $plugins );
-
-
 // Functions.
 
 function get_update_message( $type, $plugin, $copied ) {
