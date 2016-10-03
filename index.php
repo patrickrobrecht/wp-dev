@@ -1,16 +1,18 @@
-<?php include_once 'functions.php';
-	if ( isset( $_GET['update'] ) && in_array( $_GET['update'], $plugins) ) {
-		$fresh_plugin = $_GET['update'];
-	} else {
-		$fresh_plugin = '';
-	}
-	
+<?php include_once 'functions.php';	
+	$custom_plugins = false;
 	if ( isset( $_GET['plugins'] ) ) {
 		$regex = '@([a-z]|[0-9]|-|,)+@s';
 		$plugins_test = strtolower( $_GET['plugins'] );
 		if ( preg_match( $regex, $plugins_test ) ) {
 			$plugins = explode( ',', $plugins_test );
+			$custom_plugins = true;
 		}
+	}
+	
+	if ( isset( $_GET['update'] ) && in_array( $_GET['update'], $plugins) ) {
+		$fresh_plugin = $_GET['update'];
+	} else {
+		$fresh_plugin = '';
 	}
 ?>
 <!DOCTYPE html>
@@ -66,7 +68,7 @@
 				<th scope="col">Contributors</th>
 				<th scope="col">Latest version</th>
 				<th scope="col" colspan="2">Version Stats</th>
-				<th scope="col">Support</th>
+				<th scope="col" colspan="2">Support</th>
 				<th scope="col" colspan="3">Development</th>
 				<th scope="col" colspan="2">Translations</th>
 				<th scope="col">Cache</th>
@@ -76,6 +78,7 @@
 			<?php foreach( $plugins as $plugin ) {
 				$plugin_url = sprintf( 'https://wordpress.org/plugins/%s', $plugin );
 				$support_url = sprintf( 'https://wordpress.org/support/plugin/%s', $plugin );
+				$support_feed_url = sprintf( 'https://wordpress.org/support/plugin/%s/feed/', $plugin );
 				$svn_url = sprintf( 'https://plugins.svn.wordpress.org/%s/', $plugin );
 				$trac_url = sprintf( 'https://plugins.trac.wordpress.org/browser/%s/', $plugin );
 				$development_log_rss_url = sprintf( 'https://plugins.trac.wordpress.org/log/%s?limit=100&mode=stop_on_copy&format=rss', $plugin );
@@ -85,6 +88,11 @@
 				$latest_version_array = explode( '.', $latest_version );
 				$latest_version_2 = $latest_version_array[0] . '.' . $latest_version_array[1];
 				$latest_version_2_stats = $plugins_stats[ $plugin ]->$latest_version_2;
+			
+				$update_url = sprintf( '?update=%s', $plugin );
+				if ( $custom_plugins ) {
+					$update_url .= sprintf( '&plugins=%s', $_GET['plugins'] );
+				}
 			?>
 			<tr>
 				<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
@@ -103,7 +111,8 @@
 					}?>
 				<td><a href="#chart-<?php echo $plugin; ?>">Stats &darr;</a></td>
 				
-				<td><a href="<?php echo $support_url; ?>">Support forum</a></td>
+				<td><a href="<?php echo $support_url; ?>">Forum</a></td>
+				<td><a href="<?php echo $support_feed_url; ?>">RSS</a></td>
 				<td><a href="<?php echo $svn_url; ?>">SVN</a>
 				<td><a href="<?php echo $trac_url; ?>">Trac</a></td>
 				<td><a href="<?php echo $development_log_rss_url; ?>">Log RSS</a></td>
@@ -111,7 +120,7 @@
 				<td><a href="<?php echo $translations_url; ?>">Translate</a></td>
 				<td><a href="#translations-<?php echo $plugin; ?>">Translations &darr;</a></td>
 				
-				<td><a href="?update=<?php echo $plugin; ?>">Refresh cache</td>
+				<td><a href="<?php echo $update_url; ?>">Refresh cache</td>
 			</tr>
 			<?php } ?>
 		</tbody>
