@@ -53,7 +53,10 @@
 		$translations_array = array();
 		foreach( $translations as $translation ) {
 			$translations_array[ $translation->language ] = $translation;
-			$active_languages[ $translation->language] = $translation->native_name;
+			$active_languages[ $translation->language] = array( 
+					'english_name' => $translation->english_name,
+					'native_name' => $translation->native_name
+			);
 		}
 		$plugins_translations[ $plugin ] = $translations_array;
 	}
@@ -172,7 +175,9 @@
 	<table id="table-translations">
 		<thead>
 			<tr>
-				<th scope="col" colspan="2">Language</th>
+				<th scope="col">English name</th>
+				<th scope="col">Native name</th>
+				<th scope="col">Language slug</th>
 				<?php foreach( $plugins as $plugin ) { ?>
 				<th scope="col" id="translations-<?php echo $plugin; ?>"><?php echo sprintf(
 						'<a href="https://translate.wordpress.org/projects/wp-plugins/%s">%s</a>',
@@ -184,9 +189,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			<?php foreach( $active_languages as $language => $language_name ) { ?>
+			<?php foreach( $active_languages as $language => $names ) { ?>
 			<tr>
-				<th scope="row"><?php echo $language_name; ?></th>
+				<th scope="row"><?php echo $names['english_name']; ?></th>
+				<th scope="row"><?php echo $names['native_name']; ?></th>
 				<td><?php echo $language; ?></td>
 				<?php foreach( $plugins as $plugin ) {
 					$translations = $plugins_translations[ $plugin ];
@@ -205,7 +211,7 @@
 						);
 					} else {
 						$class = 'missing';
-						$text = "-";
+						$text = "&mdash;";
 					} ?>
 				<td class="<?php echo $class; ?>"><?php echo $text; ?></td>
 				<?php } ?>
