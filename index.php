@@ -74,6 +74,7 @@
 				<th scope="col">Contributors</th>
 				<th scope="col">Latest version</th>
 				<th scope="col" colspan="2">Version Stats</th>
+				<th scope="col">Ratings</th>
 				<th scope="col" colspan="2">Support</th>
 				<th scope="col" colspan="3">Development</th>
 				<th scope="col" colspan="2">Translations</th>
@@ -101,7 +102,7 @@
 				}
 			?>
 			<tr>
-				<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
+				<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></summary></td>
 				<td><?php echo $plugins_data[ $plugin ]->author; ?></td>
 				<td><?php $contributors = $plugins_data[ $plugin ]->contributors;
 						foreach ( $contributors as $contributor_name => $wordpress_profile_url ) { ?>
@@ -115,8 +116,9 @@
 									$latest_version_2
 							);
 					}?>
-				<td><a href="#chart-<?php echo $plugin; ?>">Stats &darr;</a></td>
-				
+				<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats &darr;</a></td>
+				<td><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?> &darr;</a></td>
+
 				<td><a href="<?php echo $support_url; ?>">Forum</a></td>
 				<td><a href="<?php echo $support_feed_url; ?>">RSS</a></td>
 				<td><a href="<?php echo $svn_url; ?>">SVN</a>
@@ -137,14 +139,14 @@
 	});
 	</script>
 	
-	<h2>Plugin Version Stats</h2>
+	<h2>Installed Versions</h2>
 	<?php foreach( $plugins as $plugin ) {
 		$versions = $plugins_stats[ $plugin ];
 	?>
-	<div id="chart-<?php echo $plugin; ?>" class="chart"></div>
+	<div id="chart-versions-<?php echo $plugin; ?>" class="chart"></div>
 	<script>
 	jQuery(function() {
-		jQuery('#chart-<?php echo $plugin; ?>').highcharts({
+		jQuery('#chart-versions-<?php echo $plugin; ?>').highcharts({
 			chart: {
 				type: 'pie'
 			},
@@ -165,6 +167,46 @@
 			},
 			exporting: {
 				filename: 'versions-<?php echo $plugin; ?>'
+			}
+		});
+	});
+	</script>		
+	<?php } ?>
+
+	<h2>Ratings</h2>
+	<?php foreach( $plugins as $plugin ) {
+		$ratings = $plugins_data[ $plugin ]->ratings;
+	?>
+	<div id="chart-ratings-<?php echo $plugin; ?>" class="chart"></div>
+	<script>
+	jQuery(function() {
+		jQuery('#chart-ratings-<?php echo $plugin; ?>').highcharts({
+			chart: {
+				type: 'pie'
+			},
+			title: {
+				text: 'Ratings for <?php echo $plugins_data[ $plugin ]->name; ?>'
+			},
+			legend: {
+				enabled: true,
+			},
+			series: [ {
+				name: 'Ratings',
+				data: [ <?php foreach( $ratings as $stars => $count ) {
+							if ( $count > 0) {
+								$stars_string = '1 star';
+								if ( intval( $stars ) > 1 ) {
+									$stars_string = $stars . ' stars';
+								}	
+								echo "{name: '" . $stars_string . "', y: " . $count . "},";
+							}
+						} ?> ]
+			} ],
+			credits: {
+				enabled: false
+			},
+			exporting: {
+				filename: 'ratings-<?php echo $plugin; ?>'
 			}
 		});
 	});
