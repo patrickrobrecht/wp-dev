@@ -8,6 +8,8 @@ th,td{padding:.7em;vertical-align:top;}
 
 a,a:hover,a:focus{color:#000;text-decoration:none;}
 
+.right{text-align:right;}
+
 .chart{width:300px;height:320px;float:left;}
 
 .latest{background:#46b450 !important;}

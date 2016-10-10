@@ -75,8 +75,10 @@
 				<th scope="col">Latest version</th>
 				<th scope="col" colspan="2">Version Stats</th>
 				<th scope="col">Ratings</th>
+				<th scope="col">Downloads</th>
 				<th scope="col" colspan="2">Support</th>
 				<th scope="col" colspan="3">Development</th>
+				<th scope="col">Last Update</th>
 				<th scope="col" colspan="2">Translations</th>
 				<th scope="col">Cache</th>
 			</tr>
@@ -117,14 +119,15 @@
 							);
 					}?>
 				<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats &darr;</a></td>
-				<td><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?> &darr;</a></td>
-
+				<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?> &darr;</a></td>
+				<td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?>
+		
 				<td><a href="<?php echo $support_url; ?>">Forum</a></td>
 				<td><a href="<?php echo $support_feed_url; ?>">RSS</a></td>
 				<td><a href="<?php echo $svn_url; ?>">SVN</a>
 				<td><a href="<?php echo $trac_url; ?>">Trac</a></td>
 				<td><a href="<?php echo $development_log_rss_url; ?>">Log RSS</a></td>
-				
+				<td><?php echo date( 'Y-m-d H:i:s', strtotime( $plugins_data[ $plugin ]->last_updated ) ); ?></td>							
 				<td><a href="<?php echo $translations_url; ?>">Translate</a></td>
 				<td><a href="#translations-<?php echo $plugin; ?>">Translations &darr;</a></td>
 				
