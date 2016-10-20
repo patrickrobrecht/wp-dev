@@ -31,7 +31,17 @@
 	<script src="js/exporting.js"></script>
 </head>
 <body>
-	<h1>Plugins and their translations</h1>
+	<header>
+		<h1>WordPress Plugins and their translations</h1>
+		<nav>
+			<ul>
+				<li><a href="#plugins">Plugins</a></li>
+				<li><a href="#versions">Versions</a></li>
+				<li><a href="#ratings">Ratings</a></li>
+				<li><a href="#translations">Translations</a></li>
+			</ul>
+		</nav>
+	</header>
 	<div id="messages">
 <?php
 	$start_time = microtime( true );
@@ -65,7 +75,7 @@
 ?>
 	</div>
 
-	<h2>Plugins</h2>
+	<h2 id="plugins">Plugins</h2>
 	<table id="table-plugins">
 		<thead>
 			<tr>
@@ -142,7 +152,7 @@
 	});
 	</script>
 	
-	<h2>Installed Versions</h2>
+	<h2 id="versions">Installed Versions</h2>
 	<?php foreach( $plugins as $plugin ) {
 		$versions = $plugins_stats[ $plugin ];
 	?>
@@ -176,7 +186,7 @@
 	</script>		
 	<?php } ?>
 
-	<h2>Ratings</h2>
+	<h2 id="ratings">Ratings</h2>
 	<?php foreach( $plugins as $plugin ) {
 		$ratings = $plugins_data[ $plugin ]->ratings;
 	?>
@@ -270,6 +280,9 @@
 	});
 	</script>
 	
-	<p><?php echo get_duration_for_output($start_time, 'Generated in %s seconds.'); ?></p>
+	<footer>
+		<p><?php echo get_duration_for_output($start_time, 'Generated in %s seconds.'); ?></p>
+		<p>Source Code: <a href="https://github.com/patrickrobrecht/wp-dev">GitHub</a>. License: GPL v3.</p>
+	</footer>
 </body>
 </html>
