@@ -11,7 +11,7 @@ function get_update_message( $type, $plugin, $copied ) {
 }
 
 function get_plugin_file( $plugin, $update = false ) {
-	$file_cache = 'data/plugins/' . $plugin . '.json';
+	$file_cache = dirname(__FILE__) . '/data/plugins/' . $plugin . '.json';
 	if ( $update || !file_exists( $file_cache ) || is_old( $file_cache ) ) {
 		$api_url = sprintf(
 				'https://api.wordpress.org/plugins/info/1.0/%s.json',
@@ -24,7 +24,7 @@ function get_plugin_file( $plugin, $update = false ) {
 }
 
 function get_plugin_stats_file( $plugin, $update = false ) {
-	$file_cache = 'data/plugins-stats/' . $plugin . '.json';
+	$file_cache = dirname(__FILE__) . '/data/plugins-stats/' . $plugin . '.json';
 	if ( $update || !file_exists( $file_cache ) || is_old( $file_cache ) ) {
 		$api_url = sprintf(
 				'https://api.wordpress.org/stats/plugin/1.0/%s',
@@ -37,7 +37,7 @@ function get_plugin_stats_file( $plugin, $update = false ) {
 }
 
 function get_plugin_translations_file( $plugin, $update = false ) {
-	$file_cache = 'data/plugins-translations/' . $plugin . '.json';
+	$file_cache = dirname(__FILE__) . '/data/plugins-translations/' . $plugin . '.json';
 	if ( $update || !file_exists( $file_cache ) || is_old( $file_cache ) ) {
 		$api_url = sprintf(
 				'https://api.wordpress.org/translations/plugins/1.0/?slug=%s',
