@@ -114,7 +114,7 @@
 				}
 			?>
 			<tr>
-				<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></summary></td>
+				<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
 				<td><?php echo $plugins_data[ $plugin ]->author; ?></td>
 				<td><?php $contributors = $plugins_data[ $plugin ]->contributors;
 						foreach ( $contributors as $contributor_name => $wordpress_profile_url ) { ?>
@@ -141,7 +141,7 @@
 				<td><a href="<?php echo $translations_url; ?>">Translate</a></td>
 				<td><a href="#translations-<?php echo $plugin; ?>">Translations &darr;</a></td>
 				
-				<td><a href="<?php echo $update_url; ?>">Refresh cache</td>
+				<td><a href="<?php echo $update_url; ?>">Refresh cache</a></td>
 			</tr>
 			<?php } ?>
 		</tbody>
