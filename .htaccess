@@ -59,9 +59,6 @@
 	# force browsers to stick to the declared content-type
 	Header always set X-Content-Type-Options "nosniff"
 	
-	# public key pins - generated with https://report-uri.io/home/pkp_hash
-	Header always set Public-Key-Pins "pin-sha256=\"AxTxBy2j8Kg4/hP0t+l/XARLnkEZYhwSiVfH2103hjg=\"; pin-sha256=\"YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg=\"; pin-sha256=\"grX4Ta9HpZx6tSHkmCrvpApTQGo67CYDnvprLg5yRME=\"; pin-sha256=\"Vjs8r4z+80wjNcr1YKepWQboSIRi63WsWXhIMN+eWys=\"; max-age=2592000;"
-	
 	# Remove sever information (this does not always work)
 	Header set Server ""
 	Header always unset Server
