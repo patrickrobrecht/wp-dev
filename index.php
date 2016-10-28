@@ -22,8 +22,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>WordPress plugins and their translations</title>
-	<link rel="stylesheet" href="css/theme.default.css">
+	<title>WordPress Plugins Overview</title>
 	<link rel="stylesheet" href="css/style.css">
 	<script src="js/jquery.min.js"></script>
 	<script src="js/jquery.tablesorter.js"></script>
@@ -32,7 +31,13 @@
 </head>
 <body>
 	<header>
-		<h1>WordPress Plugins and their translations</h1>
+		<h1>
+			<?php if ( $custom_plugins || $fresh_plugin != '') { ?>
+			<a href="./">WordPress Plugins Overview</a>
+			<?php } else { ?>
+			WordPress Plugins Overview
+			<?php } ?>
+		</h1>
 		<nav>
 			<ul>
 				<li><a href="#plugins">Plugins</a></li>
@@ -41,8 +46,9 @@
 				<li><a href="#translations">Translations</a></li>
 			</ul>
 		</nav>
+		<div id="clear-header"></div>
 	</header>
-	<div id="messages">
+	<ul id="messages">
 <?php
 	$start_time = microtime( true );
 	
@@ -73,22 +79,22 @@
 	
 	asort( $active_languages );
 ?>
-	</div>
+	</ul>
 
 	<h2 id="plugins">Plugins</h2>
 	<table id="table-plugins">
 		<thead>
 			<tr>
-				<th scope="col">Plugin Name</th>
+				<th scope="col">Plugin name</th>
 				<th scope="col">Author</th>
 				<th scope="col">Contributors</th>
 				<th scope="col">Latest version</th>
-				<th scope="col" colspan="2">Version Stats</th>
+				<th scope="col" colspan="2">Version stats</th>
 				<th scope="col">Ratings</th>
 				<th scope="col">Downloads</th>
 				<th scope="col" colspan="2">Support</th>
 				<th scope="col" colspan="3">Development</th>
-				<th scope="col">Last Update</th>
+				<th scope="col">Last updated</th>
 				<th scope="col" colspan="2">Translations</th>
 				<th scope="col">Cache</th>
 			</tr>
@@ -128,8 +134,8 @@
 									$latest_version_2
 							);
 					}?>
-				<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats &darr;</a></td>
-				<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?> &darr;</a></td>
+				<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats</a></td>
+				<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?></a></td>
 				<td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?>
 		
 				<td><a href="<?php echo $support_url; ?>">Forum</a></td>
@@ -139,7 +145,7 @@
 				<td><a href="<?php echo $development_log_rss_url; ?>">Log RSS</a></td>
 				<td><?php echo date( 'Y-m-d H:i:s', strtotime( $plugins_data[ $plugin ]->last_updated ) ); ?></td>							
 				<td><a href="<?php echo $translations_url; ?>">Translate</a></td>
-				<td><a href="#translations-<?php echo $plugin; ?>">Translations &darr;</a></td>
+				<td><a href="#translations-<?php echo $plugin; ?>">Translations</a></td>
 				
 				<td><a href="<?php echo $update_url; ?>">Refresh cache</a></td>
 			</tr>
@@ -281,8 +287,10 @@
 	</script>
 	
 	<footer>
-		<p><?php echo get_duration_for_output($start_time, 'Generated in %s seconds.'); ?></p>
-		<p>Source Code: <a href="https://github.com/patrickrobrecht/wp-dev">GitHub</a>. License: GPL v3.</p>
+		<p>A project by <a href="https://patrick-robrecht.de/">Patrick Robrecht</a>.
+			License: GPL v3.
+			Source Code: <a href="https://github.com/patrickrobrecht/wp-dev">GitHub</a>.</p>
 	</footer>
+	<!-- <?php echo get_duration_for_output($start_time, 'Generated in %s seconds.'); ?> -->
 </body>
 </html>

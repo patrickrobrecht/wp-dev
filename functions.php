@@ -3,9 +3,9 @@
 
 function get_update_message( $type, $plugin, $copied ) {
 	if ( $copied ) {
-		$message = '<p>Updated local cache: %s file for %s</p>';
+		$message = '<li><span class="success">Updated</span>: %s file for %s</li>';
 	} else {
-		$message = '<p>No local update: %s file for %s</p>';
+		$message = '<li><span class="error">Error</span>: could not update %s file for %s</li>';
 	}
 	return sprintf( $message, $type, $plugin );
 }

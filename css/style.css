@@ -1,23 +1,64 @@
 @charset "UTF-8";
 
-body{font-family:Helvetica,Arial,sans-serif;}
-nav ul{list-style:none;}
-nav li{display:inline;margin-right:.5em;}
+body{font-family:"Lucida Grande","Lucida Sans Unicode",Helvetica,Arial,sans-serif;}
 
+a,a:hover,a:focus{text-decoration:none;border-bottom:1px solid;}
+a[href^="#"]:after{content:" ↓";}
 
-h2{clear:both;margin-top:2em;}
+h2{clear:both;margin-top:1em;color:#1982d1;}
 
-table{border-collapse:collapse;clear:both;}
+/* header and footer */
+header,footer{background:#1982d1;}
+header{padding:.5em;}
+header h1, header ul{float:left;margin:0;}
+header,header a, footer, footer a{color:#fff;text-decoration:none;}
+nav ul{float:right;padding:.7em;list-style:none;}
+nav li{display:inline;}
+nav a{padding:1em;}
+#clear-header{clear:both;}
+footer{margin-top:2em;padding:.1em;text-align:center;}
+
+#messages li{padding:.6em 0;}
+.success{padding:.3em;background:#46b450;}
+.error{padding:.3em;background:#dc3232;}
+
+/* tables, partly inspired by tablesorter's default theme */
+table{clear:both;width:100%;border-collapse:collapse;font-size:.7em;text-align:left;}
 tr:nth-child(2n){background:#ddd;}
-th,td{padding:.7em;vertical-align:top;}
+th,td{padding:4px;vertical-align:top;}
+table a{color:#000;}
+th,thead td{border-bottom:#ccc 2px solid;}
 
-table a,table a:hover,table a:focus{color:#000;text-decoration:none;}
+.tablesorter-default .header,
+.tablesorter-default .tablesorter-header {
+	background: url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==) center right no-repeat;
+	cursor: pointer;
+	white-space: normal;
+	padding: 4px 20px 4px 4px;
+}
+.tablesorter-default thead .headerSortUp,
+.tablesorter-default thead .tablesorter-headerSortUp,
+.tablesorter-default thead .tablesorter-headerAsc {
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+	border-bottom: #000 2px solid;
+}
+.tablesorter-default thead .headerSortDown,
+.tablesorter-default thead .tablesorter-headerSortDown,
+.tablesorter-default thead .tablesorter-headerDesc {
+	background-image: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
+	border-bottom: #000 2px solid;
+}
+.tablesorter-default thead .sorter-false {
+	background-image: none;
+	cursor: default;
+	padding: 4px;
+}
 
 .right{text-align:right;}
-
-.chart{width:300px;height:320px;float:left;}
-
 .latest{background:#46b450 !important;}
 .old{background:#f1adad !important;}
 .missing{background:#dc3232 !important;}
 .latest a,.old a,.missing{color:#fff;}
+
+/* charts */
+.chart{width:300px;height:320px;float:left;}
