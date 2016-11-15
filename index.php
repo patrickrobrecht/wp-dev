@@ -19,7 +19,7 @@
 	}
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 <head>
 	<meta charset="UTF-8">
 	<title>WordPress Plugins Overview</title>
@@ -48,7 +48,7 @@
 		</nav>
 		<div id="clear-header"></div>
 	</header>
-	<article>
+	<main>
 		<ul id="messages">
 	<?php
 		$start_time = microtime( true );
@@ -236,7 +236,7 @@
 		<?php } ?>
 		</section>
 		<section>
-		<h2 id="translations">Translations</h2>	
+			<h2 id="translations">Translations</h2>	
 			<table id="table-translations">
 				<thead>
 					<tr>
@@ -256,8 +256,8 @@
 				<tbody>
 					<?php foreach( $active_languages as $language => $names ) { ?>
 					<tr>
-						<th scope="row"><?php echo $names['english_name']; ?></th>
-						<th scope="row"><?php echo $names['native_name']; ?></th>
+						<td><?php echo $names['english_name']; ?></td>
+						<td><?php echo $names['native_name']; ?></td>
 						<td><?php echo $language; ?></td>
 						<?php foreach( $plugins as $plugin ) {
 							$translations = $plugins_translations[ $plugin ];
@@ -290,7 +290,7 @@
 			});
 			</script>
 		</section>
-	</article>	
+	</main>	
 	<footer>
 		<p>A project by <a href="https://patrick-robrecht.de/">Patrick Robrecht</a>.
 			License: GPL v3.

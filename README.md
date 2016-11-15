@@ -1,6 +1,12 @@
 # WordPress Plugin Development
 
-[This application](https://wp-dev.patrick-robrecht.de/) provides a summary for wordpress.org plugins with data accessible via the Plugins API.
+This application provides a [summary for wordpress.org plugins](https://wp-dev.patrick-robrecht.de/) with data accessible via the WordPress.org Plugins API:
+
+* general data, such as author, latest version, number of downloads, URLs of WordPress.org pages
+* installed versions
+* ratings
+* translations via [Translating WordPress](https://translate.wordpress.org/)
+
 
 ## Parameters
 
