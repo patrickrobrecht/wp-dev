@@ -121,13 +121,13 @@
 						}
 					?>
 					<tr>
-						<td><a href="<?php echo $plugin_url; ?>"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
-						<td><?php echo $plugins_data[ $plugin ]->author; ?></td>
+						<td><a href="<?php echo $plugin_url; ?>" target="_blank"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
+						<td><?php echo str_replace( '<a', '<a target="_blank"', $plugins_data[ $plugin ]->author ); ?></td>
 						<td><?php $contributors = $plugins_data[ $plugin ]->contributors;
 								foreach ( $contributors as $contributor_name => $wordpress_profile_url ) { ?>
-							<a href="<?php echo $wordpress_profile_url; ?>"><?php echo $contributor_name; ?></a>	
+							<a href="<?php echo $wordpress_profile_url; ?>" target="_blank"><?php echo $contributor_name; ?></a>	
 							<?php } ?></td>
-						<td><a href="<?php echo $plugins_data[ $plugin ]->download_link; ?>"><?php echo $latest_version; ?></a></td>
+						<td><a href="<?php echo $plugins_data[ $plugin ]->download_link; ?>" target="_blank"><?php echo $latest_version; ?></a></td>
 						<td><?php if ( $latest_version_2_stats ) {
 									echo sprintf(
 											'%.2f %% on %s.x',
@@ -139,13 +139,13 @@
 						<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?></a></td>
 						<td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?>
 				
-						<td><a href="<?php echo $support_url; ?>">Forum</a></td>
-						<td><a href="<?php echo $support_feed_url; ?>">RSS</a></td>
-						<td><a href="<?php echo $svn_url; ?>">SVN</a>
-						<td><a href="<?php echo $trac_url; ?>">Trac</a></td>
-						<td><a href="<?php echo $development_log_rss_url; ?>">Log RSS</a></td>
+						<td><a href="<?php echo $support_url; ?>" target="_blank">Forum</a></td>
+						<td><a href="<?php echo $support_feed_url; ?>" target="_blank">RSS</a></td>
+						<td><a href="<?php echo $svn_url; ?>" target="_blank">SVN</a>
+						<td><a href="<?php echo $trac_url; ?>" target="_blank">Trac</a></td>
+						<td><a href="<?php echo $development_log_rss_url; ?>" target="_blank">Log RSS</a></td>
 						<td><?php echo date( 'Y-m-d H:i:s', strtotime( $plugins_data[ $plugin ]->last_updated ) ); ?></td>							
-						<td><a href="<?php echo $translations_url; ?>">Translate</a></td>
+						<td><a href="<?php echo $translations_url; ?>" target="_blank">Translate</a></td>
 						<td><a href="#translations-<?php echo $plugin; ?>">Translations</a></td>
 						
 						<td><a href="<?php echo $update_url; ?>">Refresh cache</a></td>
@@ -245,7 +245,7 @@
 						<th scope="col">Language slug</th>
 						<?php foreach( $plugins as $plugin ) { ?>
 						<th scope="col" id="translations-<?php echo $plugin; ?>"><?php echo sprintf(
-								'<a href="https://translate.wordpress.org/projects/wp-plugins/%s">%s</a>',
+								'<a href="https://translate.wordpress.org/projects/wp-plugins/%s" target="_blank">%s</a>',
 								$plugin,
 								$plugins_data[ $plugin ]->name
 							); ?>
@@ -270,7 +270,7 @@
 									$class = 'old';
 								}
 								$text = sprintf(
-										'<a href="%s">%s</a>',
+										'<a href="%s" target="_blank">%s</a>',
 										$translation->package,
 										$translation->version
 								);
