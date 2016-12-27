@@ -26,8 +26,9 @@ footer{margin-top:2em;padding:.1em;text-align:center;}
 table{clear:both;width:100%;border-collapse:collapse;font-size:.7em;text-align:left;}
 tr:nth-child(2n){background:#ddd;}
 th,td{padding:4px;vertical-align:top;}
+.small{width:20px;}
 table a{color:#000;}
-th,thead td{border-bottom:#ccc 2px solid;}
+thead th,thead td{border-bottom:#ccc 2px solid;}
 
 .tablesorter-default .header,
 .tablesorter-default .tablesorter-header {

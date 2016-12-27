@@ -1,4 +1,4 @@
-# .htaccess for wp-dev.patrick-robrecht.de
+# .htaccess for WordPress Plugins Overview
 
 # DOMAIN AND SUBDOMAIN REWRITE
 <IfModule mod_rewrite.c>
@@ -53,23 +53,18 @@
 	Header always set X-XSS-Protection "1; mode=block"
 	
 	# whitelist sources of approve content which prevents the browser from loading malicious assets
-#	Header set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
 	Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
 	
 	# force browsers to stick to the declared content-type
 	Header always set X-Content-Type-Options "nosniff"
 	
-	# Remove sever information (this does not always work)
+	# Remove server information
 	Header set Server ""
 	Header always unset Server
 	
 	# Remove PHP version etc.
 	Header set X-Powered-By ""
 	Header always unset X-Powered-By
-	
-	# Remove some WordPress specific headers
-	Header always unset X-Pingback
-	Header always unset WP-Super-Cache
 </IfModule>
 
 # ENABLE GZIP COMPRESSION
@@ -84,6 +79,15 @@
 
 # DISALLOW ACCESS TO PRIVATE FILES
 <files config.php>
+	<IfModule mod_authz_core.c>
+	    Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+    	Order allow,deny
+    	Deny from all
+	</IfModule>
+</files>
+<files config.sample.php>
 	<IfModule mod_authz_core.c>
 	    Require all denied
 	</IfModule>

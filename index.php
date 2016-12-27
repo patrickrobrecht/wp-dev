@@ -58,6 +58,8 @@
 		$plugins_data = array();
 		$plugins_stats = array();
 		$plugins_translations = array();
+		$plugins_translations_count_latest = array();
+		$plugins_translations_count_old = array();
 		$active_languages = array();
 		foreach( $plugins as $plugin ) {		
 			$plugin_data_file = get_plugin_file( $plugin, $plugin == $fresh_plugin );
@@ -71,12 +73,14 @@
 			$translations_array = array();
 			foreach( $translations as $translation ) {
 				$translations_array[ $translation->language ] = $translation;
-				$active_languages[ $translation->language] = array( 
+				$active_languages[ $translation->language ] = array( 
 						'english_name' => $translation->english_name,
 						'native_name' => $translation->native_name
 				);
 			}
 			$plugins_translations[ $plugin ] = $translations_array;
+			$plugins_translations_count_latest[ $plugin ] = 0;
+			$plugins_translations_count_old[ $plugin ] = 0;
 		}
 		
 		asort( $active_languages );
@@ -90,15 +94,16 @@
 						<th scope="col">Plugin name</th>
 						<th scope="col">Author</th>
 						<th scope="col">Contributors</th>
-						<th scope="col">Latest version</th>
+						<th scope="col" class="small">Latest version</th>
 						<th scope="col" colspan="2">Version stats</th>
-						<th scope="col">Ratings</th>
+						<th scope="col" class="small">Compatible up to</th>
+						<th scope="col" class="small">Ratings</th>
 						<th scope="col">Downloads</th>
-						<th scope="col" colspan="2">Support</th>
-						<th scope="col" colspan="3">Development</th>
-						<th scope="col">Last updated</th>
-						<th scope="col" colspan="2">Translations</th>
-						<th scope="col">Cache</th>
+						<th scope="col">Support</th>
+						<th scope="col">Development</th>
+						<th scope="col" class="small">Last updated</th>
+						<th scope="col">Translations</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -116,6 +121,8 @@
 						$latest_version_2 = $latest_version_array[0] . '.' . $latest_version_array[1];
 						$latest_version_2_stats = $plugins_stats[ $plugin ]->$latest_version_2;
 					
+						$last_updated = strtotime( $plugins_data[ $plugin ]->last_updated );
+						
 						$update_url = sprintf( '?update=%s', $plugin );
 						if ( $custom_plugins ) {
 							$update_url .= sprintf( '&plugins=%s', $_GET['plugins'] );
@@ -137,19 +144,18 @@
 									);
 							}?>
 						<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats</a></td>
-						<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo $plugins_data[ $plugin ]->num_ratings; ?></a></td>
-						<td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?>
-				
-						<td><a href="<?php echo $support_url; ?>" target="_blank">Forum</a></td>
-						<td><a href="<?php echo $support_feed_url; ?>" target="_blank">RSS</a></td>
+						<td>WP <?php echo $plugins_data[ $plugin]->tested; ?></td>
+						<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo number_format( intval( $plugins_data[ $plugin ]->num_ratings ) ); ?></a></td>
+						<td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?>			
+						<td><a href="<?php echo $support_url; ?>" target="_blank">Forum</a>
+							<a href="<?php echo $support_feed_url; ?>" target="_blank">RSS</a></td>
 						<td><a href="<?php echo $svn_url; ?>" target="_blank">SVN</a>
-						<td><a href="<?php echo $trac_url; ?>" target="_blank">Trac</a></td>
-						<td><a href="<?php echo $development_log_rss_url; ?>" target="_blank">Log RSS</a></td>
-						<td><?php echo date( 'Y-m-d H:i:s', strtotime( $plugins_data[ $plugin ]->last_updated ) ); ?></td>							
-						<td><a href="<?php echo $translations_url; ?>" target="_blank">Translate</a></td>
-						<td><a href="#translations-<?php echo $plugin; ?>">Translations</a></td>
-						
-						<td><a href="<?php echo $update_url; ?>">Refresh cache</a></td>
+							<a href="<?php echo $trac_url; ?>" target="_blank">Trac</a>
+							<a href="<?php echo $development_log_rss_url; ?>" target="_blank">RSS</a></td>
+						<td><time title="<?php echo date( 'Y-m-d H:i:s', $last_updated ); ?>"><?php echo date( 'Y-m-d', $last_updated ); ?></time></td>							
+						<td><a href="<?php echo $translations_url; ?>" target="_blank">Translate</a>
+							<a href="#translations-<?php echo $plugin; ?>">Language packs</a></td>					
+						<td><a href="<?php echo $update_url; ?>">🔃</a></td>
 					</tr>
 					<?php } ?>
 				</tbody>
@@ -237,7 +243,7 @@
 		<?php } ?>
 		</section>
 		<section>
-			<h2 id="translations">Translations</h2>	
+			<h2 id="translations">Translations (language packs)</h2>	
 			<table id="table-translations">
 				<thead>
 					<tr>
@@ -267,8 +273,10 @@
 								$translation = $translations[ $language ];
 								if ( $plugin_version == $translation->version ) {
 									$class = 'latest';
+									$plugins_translations_count_latest[ $plugin ]++;
 								} else {
 									$class = 'old';
+									$plugins_translations_count_old[ $plugin ]++;
 								}
 								$text = sprintf(
 										'<a href="%s" target="_blank">%s</a>',
@@ -284,6 +292,20 @@
 					</tr>
 					<?php } ?>
 				</tbody>
+				<tfoot>
+					<tr>
+						<th scope="row" colspan="3">Number of language packs for latest version</th>
+						<?php foreach( $plugins as $plugin ) { ?>
+						<td class="right"><?php echo number_format( $plugins_translations_count_latest[ $plugin ] ); ?></td>
+						<?php } ?>
+					</tr>
+					<tr>
+						<th scope="row" colspan="3">Number of language packs for older versions</th>
+						<?php foreach( $plugins as $plugin ) { ?>
+						<td class="right"><?php echo number_format( $plugins_translations_count_old[ $plugin ] ); ?></td>
+						<?php } ?>
+					</tr>					
+				</tfoot>
 			</table>
 			<script>
 			$("#table-translations").tablesorter({
