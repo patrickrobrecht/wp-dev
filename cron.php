@@ -5,7 +5,7 @@
 	// Update local cache with the latest data from the WordPress API.
 	$start_time = microtime( true );
 
-	foreach ( $plugins as $plugin ) {
+	foreach ( $plugins_cron_job as $plugin ) {
 		get_plugin_file( $plugin, true );
 		get_plugin_stats_file( $plugin, true );
 		get_plugin_translations_file( $plugin, true );

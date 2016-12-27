@@ -2,6 +2,7 @@
 	include_once 'config.php';
 	include_once 'functions.php';	
 	
+	$plugins = $plugins_show_default;
 	$custom_plugins = false;
 	if ( isset( $_GET['plugins'] ) ) {
 		$regex = '@([a-z]|[0-9]|-|,)+@s';

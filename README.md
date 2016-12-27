@@ -14,3 +14,10 @@ You can add the following GET parameters to https://wp-dev.patrick-robrecht.de/:
 
 * `plugins=plugin1,plugin2,plugin3`: If the parameter is a list of slugs of plugin on wordpress.org, the plugin data of those plugins is shown instead of the default ones.
 * `update=plugin-slug`: If plugin-slug is one of the plugins from the list (either the custom or the default one), the local cache of data from the wordpress.org API is updated for this plugin.
+
+## How to get your own installation
+
+* Clone this repository to some server running PHP.
+* Copy `config.sample.php` to `config.php`.
+* Edit `config.php` by defining the list of plugins to be shown by default and additional plugins to be updated by `cron.php`.
+* Create a daily cron-job for `cron.php` (recommended, but optional).
