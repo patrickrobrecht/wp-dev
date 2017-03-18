@@ -98,6 +98,7 @@
 						<th scope="col" colspan="2">Version stats</th>
 						<th scope="col" class="small">Compatible up to</th>
 						<th scope="col" class="small">Ratings</th>
+                        <th scope="col">Active installs</th>
 						<th scope="col">Downloads</th>
 						<th scope="col">Support</th>
 						<th scope="col">Development</th>
@@ -146,7 +147,8 @@
 						<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats</a></td>
 						<td>WP <?php echo $plugins_data[ $plugin]->tested; ?></td>
 						<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo number_format( intval( $plugins_data[ $plugin ]->num_ratings ) ); ?></a></td>
-						<td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?>			
+                        <td class="right"><?php echo number_format( $plugins_data[ $plugin ]->active_installs ); ?>+</td>
+                        <td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?></td>
 						<td><a href="<?php echo $support_url; ?>" target="_blank">Forum</a>
 							<a href="<?php echo $support_feed_url; ?>" target="_blank">RSS</a></td>
 						<td><a href="<?php echo $svn_url; ?>" target="_blank">SVN</a>

@@ -14,7 +14,7 @@ function get_plugin_file( $plugin, $update = false ) {
 	$file_cache = dirname(__FILE__) . '/data/plugins/' . $plugin . '.json';
 	if ( $update || !file_exists( $file_cache ) || is_old( $file_cache ) ) {
 		$api_url = sprintf(
-				'https://api.wordpress.org/plugins/info/1.0/%s.json',
+				'https://api.wordpress.org/plugins/info/1.0/%s.json?fields=active_installs',
 				$plugin
 		);
 		$copied = copy( $api_url, $file_cache );
