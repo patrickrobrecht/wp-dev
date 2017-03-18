@@ -1,7 +1,15 @@
-<?php 
+<?php
+/**
+ * Overview about plugins from the WordPress.org Plugin Directory.
+ * The page displays general information on the plugin, installed versions and ratings as well as
+ * available translation files on translate.wordpress.org.
+ *
+ * @package wp-dev
+ * @since 1.0
+ */
 	include_once 'config.php';
-	include_once 'functions.php';	
-	
+	include_once 'functions.php';
+
 	$plugins = $plugins_show_default;
 	$custom_plugins = false;
 	if ( isset( $_GET['plugins'] ) ) {
@@ -12,8 +20,8 @@
 			$custom_plugins = true;
 		}
 	}
-	
-	if ( isset( $_GET['update'] ) && in_array( $_GET['update'], $plugins) ) {
+
+	if ( isset( $_GET['update'] ) && in_array( $_GET['update'], $plugins, true ) ) {
 		$fresh_plugin = $_GET['update'];
 	} else {
 		$fresh_plugin = '';
@@ -33,7 +41,7 @@
 <body>
 	<header>
 		<h1>
-			<?php if ( $custom_plugins || $fresh_plugin != '') { ?>
+			<?php if ( $custom_plugins || $fresh_plugin !== '' ) { ?>
 			<a href="./">WordPress Plugins Overview</a>
 			<?php } else { ?>
 			WordPress Plugins Overview
@@ -61,28 +69,27 @@
 		$plugins_translations_count_latest = array();
 		$plugins_translations_count_old = array();
 		$active_languages = array();
-		foreach( $plugins as $plugin ) {		
-			$plugin_data_file = get_plugin_file( $plugin, $plugin == $fresh_plugin );
+		foreach( $plugins as $plugin ) {
+			$plugin_data_file        = get_plugin_file( $plugin, $plugin === $fresh_plugin );
 			$plugins_data[ $plugin ] = json_decode( $plugin_data_file );
-			
-			$plugin_stats_file = get_plugin_stats_file( $plugin, $plugin == $fresh_plugin );
+
+			$plugin_stats_file        = get_plugin_stats_file( $plugin, $plugin === $fresh_plugin );
 			$plugins_stats[ $plugin ] = json_decode( $plugin_stats_file );
-			
-			$plugin_translations_file = get_plugin_translations_file( $plugin, $plugin == $fresh_plugin );
-			$translations = json_decode( $plugin_translations_file )->translations;
-			$translations_array = array();
-			foreach( $translations as $translation ) {
+
+			$plugin_translations_file = get_plugin_translations_file( $plugin, $plugin === $fresh_plugin );
+			$translations             = json_decode( $plugin_translations_file )->translations;
+			$translations_array       = array();
+			foreach ( $translations as $translation ) {
 				$translations_array[ $translation->language ] = $translation;
-				$active_languages[ $translation->language ] = array( 
-						'english_name' => $translation->english_name,
-						'native_name' => $translation->native_name
+				$active_languages[ $translation->language ]   = array(
+					'english_name' => $translation->english_name,
+					'native_name'  => $translation->native_name,
 				);
 			}
-			$plugins_translations[ $plugin ] = $translations_array;
+			$plugins_translations[ $plugin ]              = $translations_array;
 			$plugins_translations_count_latest[ $plugin ] = 0;
-			$plugins_translations_count_old[ $plugin ] = 0;
+			$plugins_translations_count_old[ $plugin ]    = 0;
 		}
-		
 		asort( $active_languages );
 	?>
 		</ul>
@@ -116,14 +123,11 @@
 						$trac_url = sprintf( 'https://plugins.trac.wordpress.org/browser/%s/', $plugin );
 						$development_log_rss_url = sprintf( 'https://plugins.trac.wordpress.org/log/%s?limit=100&mode=stop_on_copy&format=rss', $plugin );
 						$translations_url = sprintf( 'https://translate.wordpress.org/projects/wp-plugins/%s', $plugin );
-						
 						$latest_version = $plugins_data[ $plugin ]->version;
 						$latest_version_array = explode( '.', $latest_version );
 						$latest_version_2 = $latest_version_array[0] . '.' . $latest_version_array[1];
 						$latest_version_2_stats = $plugins_stats[ $plugin ]->$latest_version_2;
-					
 						$last_updated = strtotime( $plugins_data[ $plugin ]->last_updated );
-						
 						$update_url = sprintf( '?update=%s', $plugin );
 						if ( $custom_plugins ) {
 							$update_url .= sprintf( '&plugins=%s', $_GET['plugins'] );
@@ -134,14 +138,14 @@
 						<td><?php echo str_replace( '<a', '<a target="_blank"', $plugins_data[ $plugin ]->author ); ?></td>
 						<td><?php $contributors = $plugins_data[ $plugin ]->contributors;
 								foreach ( $contributors as $contributor_name => $wordpress_profile_url ) { ?>
-							<a href="<?php echo $wordpress_profile_url; ?>" target="_blank"><?php echo $contributor_name; ?></a>	
-							<?php } ?></td>
+							    <a href="<?php echo $wordpress_profile_url; ?>" target="_blank"><?php echo $contributor_name; ?></a>
+                            <?php } ?></td>
 						<td><a href="<?php echo $plugins_data[ $plugin ]->download_link; ?>" target="_blank"><?php echo $latest_version; ?></a></td>
 						<td><?php if ( $latest_version_2_stats ) {
 									echo sprintf(
-											'%.2f %% on %s.x',
-											$plugins_stats[ $plugin ]->$latest_version_2,
-											$latest_version_2
+                                        '%.2f %% on %s.x',
+                                        $plugins_stats[ $plugin ]->$latest_version_2,
+                                        $latest_version_2
 									);
 							}?>
 						<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats</a></td>

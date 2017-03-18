@@ -1,4 +1,4 @@
-# WordPress Plugin Development
+# WordPress Plugins Overview
 
 This application provides a [summary for wordpress.org plugins](https://wp-dev.patrick-robrecht.de/) with data accessible via the WordPress.org Plugins API:
 
