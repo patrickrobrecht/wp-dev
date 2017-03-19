@@ -34,7 +34,7 @@
 	<title>WordPress Plugins Overview</title>
 	<link rel="stylesheet" href="css/style.css">
 	<script src="js/jquery.min.js"></script>
-	<script src="js/jquery.tablesorter.js"></script>
+	<script src="js/jquery.tablesorter.min.js"></script>
 	<script src="js/highcharts.js"></script>
 	<script src="js/exporting.js"></script>
 </head>
@@ -69,7 +69,7 @@
 		$plugins_translations_count_latest = array();
 		$plugins_translations_count_old = array();
 		$active_languages = array();
-		foreach( $plugins as $plugin ) {
+		foreach ( $plugins as $plugin ) {
 			$plugin_data_file        = get_plugin_file( $plugin, $plugin === $fresh_plugin );
 			$plugins_data[ $plugin ] = json_decode( $plugin_data_file );
 
@@ -103,9 +103,9 @@
 						<th scope="col">Contributors</th>
 						<th scope="col" class="small">Latest version</th>
 						<th scope="col" colspan="2">Version stats</th>
-						<th scope="col" class="small">Compatible up to</th>
+						<th scope="col" class="small">Compatible up to WP</th>
 						<th scope="col" class="small">Ratings</th>
-                        <th scope="col">Active installs</th>
+                        <th scope="col" class="sorter-number-plus">Active installs</th>
 						<th scope="col">Downloads</th>
 						<th scope="col">Support</th>
 						<th scope="col">Development</th>
@@ -115,7 +115,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach( $plugins as $plugin ) {
+					<?php foreach ( $plugins as $plugin ) {
 						$plugin_url = sprintf( 'https://wordpress.org/plugins/%s', $plugin );
 						$support_url = sprintf( 'https://wordpress.org/support/plugin/%s', $plugin );
 						$support_feed_url = sprintf( 'https://wordpress.org/support/plugin/%s/feed/', $plugin );
@@ -130,7 +130,7 @@
 						$last_updated = strtotime( $plugins_data[ $plugin ]->last_updated );
 						$update_url = sprintf( '?update=%s', $plugin );
 						if ( $custom_plugins ) {
-							$update_url .= sprintf( '&plugins=%s', $_GET['plugins'] );
+							$update_url .= sprintf( '&plugins=%s', $plugins );
 						}
 					?>
 					<tr>
@@ -149,7 +149,7 @@
 									);
 							}?>
 						<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats</a></td>
-						<td>WP <?php echo $plugins_data[ $plugin]->tested; ?></td>
+						<td><?php echo $plugins_data[ $plugin ]->tested; ?></td>
 						<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo number_format( intval( $plugins_data[ $plugin ]->num_ratings ) ); ?></a></td>
                         <td class="right"><?php echo number_format( $plugins_data[ $plugin ]->active_installs ); ?>+</td>
                         <td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?></td>
@@ -167,6 +167,13 @@
 				</tbody>
 			</table>
 			<script>
+            $.tablesorter.addParser({
+                id: 'number-plus',
+                format: function(s, table, cell, cellIndex) {
+                    return s.substring(0, s.length-1);
+                },
+                type: 'numeric'
+            });
 			$("#table-plugins").tablesorter({
 					sortList: [ [0,0] ],
 			});
@@ -209,7 +216,7 @@
 		</section>
 		<section>
 			<h2 id="ratings">Ratings</h2>
-			<?php foreach( $plugins as $plugin ) {
+			<?php foreach ( $plugins as $plugin ) {
 				$ratings = $plugins_data[ $plugin ]->ratings;
 			?>
 			<div id="chart-ratings-<?php echo $plugin; ?>" class="chart"></div>
