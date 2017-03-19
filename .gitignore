@@ -2,3 +2,4 @@ config.php
 data/plugins/*.json
 data/plugins-stats/*.json
 data/plugins-translations/*.json
+css/style.min.css

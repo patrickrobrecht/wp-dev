@@ -17,7 +17,9 @@ You can add the following GET parameters to https://wp-dev.patrick-robrecht.de/:
 
 ## How to get your own installation
 
-* Clone this repository to some server running PHP.
+* Clone this repository.
+* Generate the minimized CSS file `style.min.css` (using a tool like [YUI Compressor CSS](https://github.com/yui/yuicompressor)).
 * Copy `config.sample.php` to `config.php`.
 * Edit `config.php` by defining the list of plugins to be shown by default and additional plugins to be updated by `cron.php`.
+* Copy all files to your server running PHP.
 * Create a daily cron-job for `cron.php` (recommended, but optional).
