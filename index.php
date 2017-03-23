@@ -130,7 +130,7 @@
 						$last_updated = strtotime( $plugins_data[ $plugin ]->last_updated );
 						$update_url = sprintf( '?update=%s', $plugin );
 						if ( $custom_plugins ) {
-							$update_url .= sprintf( '&plugins=%s', $plugins );
+							$update_url .= sprintf( '&plugins=%s', $plugins_test );
 						}
 					?>
 					<tr>
