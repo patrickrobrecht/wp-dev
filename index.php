@@ -58,6 +58,8 @@
 		<div id="clear-header"></div>
 	</header>
 	<main>
+        <p>You can create your own dashboard by changing the URL to <code>https://wp-dev.patrick-robrecht.de/?plugins=s,s2</code>
+            with <code>s</code>, <code>s2</code> being the WordPress slug (URL: <code>https://wordpress.org/plugins/s/</code>).</p>
 		<ul id="messages">
 	<?php
 		$start_time = microtime( true );
