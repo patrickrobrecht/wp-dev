@@ -32,7 +32,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>WordPress Plugins Overview</title>
-	<link rel="stylesheet" href="css/style.min.css">
+	<link rel="stylesheet" href="css/dist/style.css">
 	<script src="js/jquery.min.js"></script>
 	<script src="js/jquery.tablesorter.min.js"></script>
 	<script src="js/highcharts.js"></script>

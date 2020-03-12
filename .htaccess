@@ -43,21 +43,16 @@
 	Header merge Cache-Control "public, must-revalidate, proxy-revalidate"
 	
 	# SET HEADERS FOR SECURITY
-	# enforce browsers to use HTTPS
-	Header always set Strict-Transport-Security "max-age=63072000; preload"
-	
-	# disallow the website to be framed
-	Header always set X-Frame-Options "deny"
-	
-	# enable XSS protection filters
-	Header always set X-XSS-Protection "1; mode=block"
-	
-	# whitelist sources of approve content which prevents the browser from loading malicious assets
+	Header set Strict-Transport-Security "max-age=63072000; preload"
+
+	Header set X-Content-Type-Options "nosniff"
+	Header set X-Frame-Options "deny"
+	Header set X-XSS-Protection "1; mode=block"
+
 	Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
-	
-	# force browsers to stick to the declared content-type
-	Header always set X-Content-Type-Options "nosniff"
-	
+	Header set Feature-Policy "vibrate 'none'"
+	Header set Referrer-Policy same-origin
+
 	# Remove server information
 	Header set Server ""
 	Header always unset Server

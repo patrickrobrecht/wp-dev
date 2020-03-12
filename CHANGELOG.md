@@ -1,5 +1,9 @@
 # WordPress Plugins Overview - Changelog
 
+## Version 1.1.0
+- Update JavaScript dependencies
+- Setup dependency management with npm and buld with gulp
+
 ## Version 1.0.1
 * Update [Tablesorter](https://github.com/Mottie/tablesorter) library to latest version 2.28.5 (minimized JavaScript file now)
 * Bugfix: sorting for active installs column
