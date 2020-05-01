@@ -2,10 +2,10 @@
   "private": true,
   "devDependencies": {
     "gulp": "^4.0.2",
-    "gulp-clean-css": "^4.2.0",
+    "gulp-clean-css": "^4.3.0",
     "gulp-sourcemaps": "^2.6.5",
     "highcharts": "^8.0.4",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "tablesorter": "^2.31.3"
   },
   "scripts": {

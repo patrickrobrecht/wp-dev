@@ -11,10 +11,9 @@ h2{clear:both;margin-top:1em;color:#1982d1;}
 header,footer{background:#1982d1;}
 header{padding:.5em;}
 header h1, header ul{float:left;margin:0;}
-header,header a, footer, footer a{color:#fff;text-decoration:none;}
+header,header a, footer, footer a{color:#fff;}
 nav ul{float:right;padding:.7em;list-style:none;}
 nav li{display:inline;}
-nav a{padding:1em;}
 #clear-header{clear:both;}
 footer{margin-top:2em;padding:.1em;text-align:center;}
 

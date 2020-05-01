@@ -19,7 +19,9 @@ function minify() {
     return gulp.src('css/style.css')
         .pipe(sourcemaps.init())
         .pipe(cleanCSS())
-        .pipe(sourcemaps.write())
+        .pipe(sourcemaps.write('./', {
+            mapFile: true
+        }))
         .pipe(gulp.dest('css/dist'));
 }
 

@@ -1,5 +1,10 @@
 # WordPress Plugins Overview - Changelog
 
+## Version 1.1.1
+- Update JavaScript dependencies
+- Add source map file for the CSS
+- Fix display on mobile screen
+
 ## Version 1.1.0
 - Update JavaScript dependencies
 - Setup dependency management with npm and buld with gulp
