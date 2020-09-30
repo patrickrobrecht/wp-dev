@@ -1,0 +1,29 @@
+{
+  "name": "patrickrobrecht/wp-dev",
+  "description": "WordPress Plugins Overview",
+  "license": "GPL-3.0",
+  "require": {
+    "php": "^7.4",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-master",
+    "squizlabs/php_codesniffer": "^3.5.5"
+  },
+  "scripts": {
+    "cs": [
+      "phpcs"
+    ],
+    "csfix": [
+      "phpcbf"
+    ],
+    "prod": [
+      "@composer install --optimize-autoloader --no-dev"
+    ]
+  },
+  "autoload": {
+    "psr-4": {
+      "WordPressPluginDashboard\\": "src/"
+    }
+  }
+}

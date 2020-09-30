@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="coding standard">
+    <description>coding standard</description>
+
+    <!-- display progress -->
+    <arg value="psv"/>
+    <!-- use colors in output -->
+    <arg name="colors"/>
+
+    <!-- inherit rules from: -->
+    <rule ref="PSR12"/>
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="140"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+
+    <!-- Paths to check -->
+    <file>src</file>
+    <file>config.sample.php</file>
+    <file>cron.php</file>
+    <file>index.php</file>
+</ruleset>

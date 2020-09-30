@@ -4,6 +4,8 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteBase /
+
+	RewriteCond %{REMOTE_ADDR} !127.0.0.1
 	RewriteCond %{HTTPS} off
 	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </IfModule>
@@ -21,7 +23,7 @@
 <IfModule mod_expires.c>
 	ExpiresActive On
 	ExpiresDefault "access plus 1 week"
-	
+
 	# CSS and Javascript
 	ExpiresByType text/css "access plus 1 year"	
 	ExpiresByType text/javascript "access plus 1 year"

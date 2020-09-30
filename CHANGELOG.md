@@ -1,5 +1,12 @@
 # WordPress Plugins Overview - Changelog
 
+## Version 1.2.0
+- Add commands for PSR-12 code style check
+- Refactor code according to PSR-12 code style
+- Integrate version stats and ratings into the table
+- Remove the diagrams and the jQuery dependency
+- Replace library for sorting table columns
+
 ## Version 1.1.1
 - Update JavaScript dependencies
 - Add source map file for the CSS

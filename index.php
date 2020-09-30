@@ -1,339 +1,275 @@
 <?php
+
 /**
- * Overview about plugins from the WordPress.org Plugin Directory.
+ * Dashboard about plugins from the WordPress.org Plugin Directory.
  * The page displays general information on the plugin, installed versions and ratings as well as
- * available translation files on translate.wordpress.org.
+ * available translations via translate.wordpress.org.
  *
  * @package wp-dev
- * @since 1.0
  */
-	include_once 'config.php';
-	include_once 'functions.php';
 
-	$plugins = $plugins_show_default;
-	$custom_plugins = false;
-	if ( isset( $_GET['plugins'] ) ) {
-		$regex = '@([a-z]|[0-9]|-|,)+@s';
-		$plugins_test = strtolower( $_GET['plugins'] );
-		if ( preg_match( $regex, $plugins_test ) ) {
-			$plugins = explode( ',', $plugins_test );
-			$custom_plugins = true;
-		}
-	}
+use WordPressPluginDashboard\Plugin;
+use WordPressPluginDashboard\WordPressApi;
 
-	if ( isset( $_GET['update'] ) && in_array( $_GET['update'], $plugins, true ) ) {
-		$fresh_plugin = $_GET['update'];
-	} else {
-		$fresh_plugin = '';
-	}
+include_once __DIR__ . '/config.php';
+include_once __DIR__ . '/vendor/autoload.php';
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-	<meta charset="UTF-8">
-	<title>WordPress Plugins Overview</title>
-	<link rel="stylesheet" href="css/dist/style.css">
-	<script src="js/jquery.min.js"></script>
-	<script src="js/jquery.tablesorter.min.js"></script>
-	<script src="js/highcharts.js"></script>
-	<script src="js/exporting.js"></script>
+    <meta charset="UTF-8">
+    <title>WordPress Plugins Dashboard</title>
+    <link rel="stylesheet" href="css/dist/style.css">
+    <script src="js/tablesort.min.js"></script>
+    <script src="js/tablesort.number.min.js"></script>
 </head>
 <body>
-	<header>
-		<h1>
-			<?php if ( $custom_plugins || $fresh_plugin !== '' ) { ?>
-			<a href="./">WordPress Plugins Overview</a>
-			<?php } else { ?>
-			WordPress Plugins Overview
-			<?php } ?>
-		</h1>
-		<nav>
-			<ul>
-				<li><a href="#plugins">Plugins</a></li>
-				<li><a href="#versions">Versions</a></li>
-				<li><a href="#ratings">Ratings</a></li>
-				<li><a href="#translations">Translations</a></li>
-			</ul>
-		</nav>
-		<div id="clear-header"></div>
-	</header>
-	<main>
-        <p>You can create your own dashboard by changing the URL to <code>https://wp-dev.patrick-robrecht.de/?plugins=s,s2</code>
-            with <code>s</code>, <code>s2</code> being the WordPress slug (URL: <code>https://wordpress.org/plugins/s/</code>).</p>
-		<ul id="messages">
-	<?php
-		$start_time = microtime( true );
-		
-		// Get the data from local cache.
-		$plugins_data = array();
-		$plugins_stats = array();
-		$plugins_translations = array();
-		$plugins_translations_count_latest = array();
-		$plugins_translations_count_old = array();
-		$active_languages = array();
-		foreach ( $plugins as $plugin ) {
-			$plugin_data_file        = get_plugin_file( $plugin, $plugin === $fresh_plugin );
-			$plugins_data[ $plugin ] = json_decode( $plugin_data_file );
+    <header>
+        <h1><a href="./">WordPress Plugins Dashboard</a></h1>
+        <nav>
+            <ul>
+                <li><a href="#plugins">Plugins</a></li>
+                <li><a href="#translations">Translations</a></li>
+            </ul>
+        </nav>
+        <div id="clear-header"></div>
+    </header>
+    <main>
+        <p>You can create your own dashboard by adding a parameter to the URL:</p>
+        <ul>
+            <li><code>/?plugins=s,s2</code> for WordPress plugin slugs <code>s</code>, <code>s2</code>
+                (as in <code>https://wordpress.org/plugins/s/</code>)</li>
+            <li>or <code>/?author=a</code> with <code>a</code> being a username on WordPress.org to list all the author's plugins.</li>
+        </ul>
+        <ul id="messages">
+<?php
+$startTime = microtime(true);
 
-			$plugin_stats_file        = get_plugin_stats_file( $plugin, $plugin === $fresh_plugin );
-			$plugins_stats[ $plugin ] = json_decode( $plugin_stats_file );
+$wordPressApi = new WordPressApi(true);
+$regex = '@([a-z]|[0-9]|-|,)+@s';
 
-			$plugin_translations_file = get_plugin_translations_file( $plugin, $plugin === $fresh_plugin );
-			$translations             = json_decode( $plugin_translations_file )->translations;
-			$translations_array       = array();
-			foreach ( $translations as $translation ) {
-				$translations_array[ $translation->language ] = $translation;
-				$active_languages[ $translation->language ]   = array(
-					'english_name' => $translation->english_name,
-					'native_name'  => $translation->native_name,
-				);
-			}
-			$plugins_translations[ $plugin ]              = $translations_array;
-			$plugins_translations_count_latest[ $plugin ] = 0;
-			$plugins_translations_count_old[ $plugin ]    = 0;
+$pluginSlugs = $plugins_show_default;
+$customPlugins = false;
+if (isset($_GET['author'])) {
+	$authorSlugFromRequest = strtolower($_GET['author']);
+	if (preg_match($regex, $authorSlugFromRequest)) {
+		$jsonFileContents = $wordPressApi->getAuthor($authorSlugFromRequest);
+		$json = json_decode($jsonFileContents, true);
+		if (isset($json['plugins'])) {
+			$pluginSlugs = array_map(
+				static function ($i) {
+					return $i['slug'];
+				},
+				$json['plugins']
+			);
 		}
-		asort( $active_languages );
-	?>
-		</ul>
-		<section>
-			<h2 id="plugins">Plugins</h2>
-			<table id="table-plugins">
-				<thead>
-					<tr>
-						<th scope="col">Plugin name</th>
-						<th scope="col">Author</th>
-						<th scope="col">Contributors</th>
-						<th scope="col" class="small">Latest version</th>
-						<th scope="col" colspan="2">Version stats</th>
-						<th scope="col" class="small">Compatible up to WP</th>
-						<th scope="col" class="small">Ratings</th>
-                        <th scope="col" class="sorter-number-plus">Active installs</th>
-						<th scope="col">Downloads</th>
-						<th scope="col">Support</th>
-						<th scope="col">Development</th>
-						<th scope="col" class="small">Last updated</th>
-						<th scope="col">Translations</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ( $plugins as $plugin ) {
-						$plugin_url = sprintf( 'https://wordpress.org/plugins/%s', $plugin );
-						$support_url = sprintf( 'https://wordpress.org/support/plugin/%s', $plugin );
-						$support_feed_url = sprintf( 'https://wordpress.org/support/plugin/%s/feed/', $plugin );
-						$svn_url = sprintf( 'https://plugins.svn.wordpress.org/%s/', $plugin );
-						$trac_url = sprintf( 'https://plugins.trac.wordpress.org/browser/%s/', $plugin );
-						$development_log_rss_url = sprintf( 'https://plugins.trac.wordpress.org/log/%s?limit=100&mode=stop_on_copy&format=rss', $plugin );
-						$translations_url = sprintf( 'https://translate.wordpress.org/projects/wp-plugins/%s', $plugin );
-						$latest_version = $plugins_data[ $plugin ]->version;
-						$latest_version_array = explode( '.', $latest_version );
-						$latest_version_2 = $latest_version_array[0] . '.' . $latest_version_array[1];
-						$latest_version_2_stats = $plugins_stats[ $plugin ]->$latest_version_2;
-						$last_updated = strtotime( $plugins_data[ $plugin ]->last_updated );
-						$update_url = sprintf( '?update=%s', $plugin );
-						if ( $custom_plugins ) {
-							$update_url .= sprintf( '&plugins=%s', $plugins_test );
-						}
-					?>
-					<tr>
-						<td><a href="<?php echo $plugin_url; ?>" target="_blank"><?php echo $plugins_data[ $plugin ]->name; ?></a></td>
-						<td><?php echo str_replace( '<a', '<a target="_blank"', $plugins_data[ $plugin ]->author ); ?></td>
-						<td><?php $contributors = $plugins_data[ $plugin ]->contributors;
-								foreach ( $contributors as $contributor_name => $wordpress_profile_url ) { ?>
-							    <a href="<?php echo $wordpress_profile_url; ?>" target="_blank"><?php echo $contributor_name; ?></a>
-                            <?php } ?></td>
-						<td><a href="<?php echo $plugins_data[ $plugin ]->download_link; ?>" target="_blank"><?php echo $latest_version; ?></a></td>
-						<td><?php if ( $latest_version_2_stats ) {
-									echo sprintf(
-                                        '%.2f %% on %s.x',
-                                        $plugins_stats[ $plugin ]->$latest_version_2,
-                                        $latest_version_2
-									);
-							}?>
-						<td><a href="#chart-versions-<?php echo $plugin; ?>">Stats</a></td>
-						<td><?php echo $plugins_data[ $plugin ]->tested; ?></td>
-						<td class="right"><a href="#chart-ratings-<?php echo $plugin; ?>"><?php echo number_format( intval( $plugins_data[ $plugin ]->num_ratings ) ); ?></a></td>
-                        <td class="right"><?php echo number_format( $plugins_data[ $plugin ]->active_installs ); ?>+</td>
-                        <td class="right"><?php echo number_format( $plugins_data[ $plugin ]->downloaded ); ?></td>
-						<td><a href="<?php echo $support_url; ?>" target="_blank">Forum</a>
-							<a href="<?php echo $support_feed_url; ?>" target="_blank">RSS</a></td>
-						<td><a href="<?php echo $svn_url; ?>" target="_blank">SVN</a>
-							<a href="<?php echo $trac_url; ?>" target="_blank">Trac</a>
-							<a href="<?php echo $development_log_rss_url; ?>" target="_blank">RSS</a></td>
-						<td><time title="<?php echo date( 'Y-m-d H:i:s', $last_updated ); ?>"><?php echo date( 'Y-m-d', $last_updated ); ?></time></td>							
-						<td><a href="<?php echo $translations_url; ?>" target="_blank">Translate</a>
-							<a href="#translations-<?php echo $plugin; ?>">Language packs</a></td>					
-						<td><a href="<?php echo $update_url; ?>">🔃</a></td>
-					</tr>
-					<?php } ?>
-				</tbody>
-			</table>
-			<script>
-            $.tablesorter.addParser({
-                id: 'number-plus',
-                format: function(s, table, cell, cellIndex) {
-                    return s.substring(0, s.length-1);
-                },
-                type: 'numeric'
-            });
-			$("#table-plugins").tablesorter({
-					sortList: [ [0,0] ],
-			});
-			</script>
-		</section>
-		<section>
-			<h2 id="versions">Installed Versions</h2>
-			<?php foreach( $plugins as $plugin ) {
-				$versions = $plugins_stats[ $plugin ];
-			?>
-			<div id="chart-versions-<?php echo $plugin; ?>" class="chart"></div>
-			<script>
-			jQuery(function() {
-				jQuery('#chart-versions-<?php echo $plugin; ?>').highcharts({
-					chart: {
-						type: 'pie'
-					},
-					title: {
-						text: 'Versions <?php echo $plugins_data[ $plugin ]->name; ?>'
-					},
-					legend: {
-						enabled: true,
-					},
-					series: [ {
-						name: 'Versions',
-						data: [ <?php foreach( $versions as $version => $count ) {
-									echo "{name: '" . $version . "', y: " . $count . "},";
-								} ?> ]
-					} ],
-					credits: {
-						enabled: false
-					},
-					exporting: {
-						filename: 'versions-<?php echo $plugin; ?>'
-					}
-				});
-			});
-			</script>		
-			<?php } ?>
-		</section>
-		<section>
-			<h2 id="ratings">Ratings</h2>
-			<?php foreach ( $plugins as $plugin ) {
-				$ratings = $plugins_data[ $plugin ]->ratings;
-			?>
-			<div id="chart-ratings-<?php echo $plugin; ?>" class="chart"></div>
-			<script>
-			jQuery(function() {
-				jQuery('#chart-ratings-<?php echo $plugin; ?>').highcharts({
-					chart: {
-						type: 'pie'
-					},
-					title: {
-						text: 'Ratings for <?php echo $plugins_data[ $plugin ]->name; ?>'
-					},
-					legend: {
-						enabled: true,
-					},
-					series: [ {
-						name: 'Ratings',
-						data: [ <?php foreach( $ratings as $stars => $count ) {
-									if ( $count > 0) {
-										$stars_string = '1 star';
-										if ( intval( $stars ) > 1 ) {
-											$stars_string = $stars . ' stars';
-										}	
-										echo "{name: '" . $stars_string . "', y: " . $count . "},";
-									}
-								} ?> ]
-					} ],
-					credits: {
-						enabled: false
-					},
-					exporting: {
-						filename: 'ratings-<?php echo $plugin; ?>'
-					}
-				});
-			});
-			</script>
-		<?php } ?>
-		</section>
-		<section>
-			<h2 id="translations">Translations (language packs)</h2>	
-			<table id="table-translations">
-				<thead>
-					<tr>
-						<th scope="col">English name</th>
-						<th scope="col">Native name</th>
-						<th scope="col">Language slug</th>
-						<?php foreach( $plugins as $plugin ) { ?>
-						<th scope="col" id="translations-<?php echo $plugin; ?>"><?php echo sprintf(
-								'<a href="https://translate.wordpress.org/projects/wp-plugins/%s" target="_blank">%s</a>',
-								$plugin,
-								$plugins_data[ $plugin ]->name
-							); ?>
-							<?php echo $plugins_data[ $plugin ]->version; ?>
-						<?php } ?>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach( $active_languages as $language => $names ) { ?>
-					<tr>
-						<td><?php echo $names['english_name']; ?></td>
-						<td><?php echo $names['native_name']; ?></td>
-						<td><?php echo $language; ?></td>
-						<?php foreach( $plugins as $plugin ) {
-							$translations = $plugins_translations[ $plugin ];
-							$plugin_version = $plugins_data[ $plugin ]->version;
-							if ( array_key_exists( $language, $translations ) ) {
-								$translation = $translations[ $language ];
-								if ( $plugin_version == $translation->version ) {
-									$class = 'latest';
-									$plugins_translations_count_latest[ $plugin ]++;
-								} else {
-									$class = 'old';
-									$plugins_translations_count_old[ $plugin ]++;
-								}
-								$text = sprintf(
-										'<a href="%s" target="_blank">%s</a>',
-										$translation->package,
-										$translation->version
-								);
-							} else {
-								$class = 'missing';
-								$text = "&mdash;";
-							} ?>
-						<td class="<?php echo $class; ?>"><?php echo $text; ?></td>
-						<?php } ?>
-					</tr>
-					<?php } ?>
-				</tbody>
-				<tfoot>
-					<tr>
-						<th scope="row" colspan="3">Number of language packs for latest version</th>
-						<?php foreach( $plugins as $plugin ) { ?>
-						<td class="right"><?php echo number_format( $plugins_translations_count_latest[ $plugin ] ); ?></td>
-						<?php } ?>
-					</tr>
-					<tr>
-						<th scope="row" colspan="3">Number of language packs for older versions</th>
-						<?php foreach( $plugins as $plugin ) { ?>
-						<td class="right"><?php echo number_format( $plugins_translations_count_old[ $plugin ] ); ?></td>
-						<?php } ?>
-					</tr>					
-				</tfoot>
-			</table>
-			<script>
-			$("#table-translations").tablesorter({
-					sortList: [ [0,0] ],
-			});
-			</script>
-		</section>
-	</main>	
-	<footer>
-		<p>A project by <a href="https://patrick-robrecht.de/">Patrick Robrecht</a>.
-			License: GPL v3.
-			Source Code: <a href="https://github.com/patrickrobrecht/wp-dev">GitHub</a>.</p>
-	</footer>
-	<!-- <?php echo get_duration_for_output($start_time, 'Generated in %s seconds.'); ?> -->
+		$customPlugins = true;
+	}
+} elseif (isset($_GET['plugins'])) {
+    $pluginSlugsFromRequest = strtolower($_GET['plugins']);
+    if (preg_match($regex, $pluginSlugsFromRequest)) {
+        $pluginSlugs = explode(',', $pluginSlugsFromRequest);
+        $customPlugins = true;
+    }
+}
+
+if (isset($_POST['update']) && in_array($_POST['update'], $pluginSlugs, true)) {
+	$freshPluginSlug = $_POST['update'];
+} else {
+	$freshPluginSlug = '';
+}
+
+$languages = [];
+$plugins = [];
+foreach ($pluginSlugs as $pluginSlug) {
+    $plugin = new Plugin($pluginSlug, $pluginSlug === $freshPluginSlug, $wordPressApi);
+    $plugins[] = $plugin;
+    foreach ($plugin->getTranslations() as $translation) {
+        $languages[$translation['language']] = [
+            'english_name' => $translation['english_name'],
+            'native_name'  => $translation['native_name'],
+        ];
+    }
+}
+asort($languages);
+?>
+        </ul>
+        <section>
+            <h2 id="plugins">Plugins</h2>
+            <table id="table-plugins">
+                <thead>
+                    <tr>
+                        <th colspan="5">General information</th>
+                        <th colspan="2">Versions</th>
+                        <th colspan="3">Compatibility</th>
+                        <th colspan="7">Ratings</th>
+                        <th colspan="3">Support</th>
+                        <th colspan="2">Translations</th>
+                        <th>Development</th>
+                    </tr>
+                    <tr data-sort-method='thead'>
+                        <th scope="col" role="columnheader">Plugin name</th>
+                        <th scope="col" role="columnheader">Author</th>
+                        <th scope="col" role="columnheader">Last updated</th>
+                        <th scope="col" role="columnheader">Active installs</th>
+                        <th scope="col" role="columnheader">Downloads</th>
+
+                        <th scope="col" role="columnheader" data-sort-method="dotsep">Latest</th>
+                        <th scope="col" role="columnheader">Stats</th>
+
+                        <th scope="col" role="columnheader" data-sort-method="dotsep">
+                            <abbr title="minimum required WordPress version">WP min</abbr>
+                        </th>
+                        <th scope="col" role="columnheader" data-sort-method="dotsep">
+                            <abbr title="maximum compatible WordPress version">WP max</abbr>
+                        </th>
+                        <th scope="col" role="columnheader" data-sort-method="dotsep">
+                            <abbr title="minimum required PHP version">PHP min</abbr>
+                        </th>
+
+                        <th scope="col" role="columnheader"><abbr title="total number of ratings">Σ</abbr></th>
+                        <th scope="col" role="columnheader"><abbr title="number of 1 star ratings">1★</abbr></th>
+                        <th scope="col" role="columnheader"><abbr title="number of 2 star ratings">2★</abbr></th>
+                        <th scope="col" role="columnheader"><abbr title="number of 3 star ratings">3★</abbr></th>
+                        <th scope="col" role="columnheader"><abbr title="number of 4 star ratings">4★</abbr></th>
+                        <th scope="col" role="columnheader"><abbr title="number of 5 star ratings">5★</abbr></th>
+                        <th scope="col" role="columnheader"><abbr title="average rating">⌀</abbr></th>
+
+                        <th scope="col" role="columnheader">threads</th>
+                        <th scope="col" role="columnheader">threads unresolved</th>
+                        <th scope="col" class="no-sort" data-sort-method="none">Links</th>
+
+                        <th scope="col" role="columnheader">Language packs</th>
+                        <th scope="col" class="no-sort" data-sort-method="none">Links</th>
+
+                        <th scope="col" class="no-sort" data-sort-method="none">Links</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($plugins as $plugin) {
+                        $versionInfo = [];
+                        foreach ($plugin->getVersionStats() as $version => $count) {
+                            $versionInfo[] = sprintf('%.2f %% on %s.x', $count, $version);
+                        }
+                        ?>
+                    <tr>
+                        <td>
+                            <a href="<?php echo $plugin->getPluginUrl(); ?>" target="_blank"><?php echo $plugin->getName(); ?></a>
+                            <form method="post">
+                                <input name="update" type="hidden" value="<?php echo $plugin->getSlug(); ?>">
+                                <button type="submit">🔃</button>
+                            </form>
+                        </td>
+                        <td><?php echo str_replace('<a', '<a target="_blank"', $plugin->getAuthor()); ?></td>
+                        <td data-sort="<?php echo date('U', $plugin->getLastUpdated()); ?>">
+                            <time title="<?php echo date('Y-m-d H:i:s', $plugin->getLastUpdated()); ?>">
+                                <?php echo date('d.m.Y', $plugin->getLastUpdated()); ?>
+                            </time>
+                        </td>
+                        <td class="right"><?php echo number_format($plugin->getActiveInstallsCount()); ?>+</td>
+                        <td class="right"><?php echo number_format($plugin->getDownloadCount()); ?></td>
+
+                        <td><a href="<?php echo $plugin->getDownloadUrl(); ?>" target="_blank"><?php echo $plugin->getVersion(); ?></a></td>
+                        <td><?php echo implode('<br>', $versionInfo); ?></td>
+
+                        <td><?php echo $plugin->getMinWordPressVersion() ?: 'unknown'; ?></td>
+                        <td><?php echo $plugin->getMaxWordPressVersion() ?: 'unknown'; ?></td>
+                        <td><?php echo $plugin->getMinPhpVersion() ?: 'unknown'; ?></td>
+
+                        <td class="right"><?php echo number_format($plugin->getRatingCount()); ?></td>
+                        <?php foreach (range(1, 5) as $i) { ?>
+                            <td class="right"><?php echo number_format($plugin->getRatings($i)); ?></td>
+                        <?php } ?>
+                        <td class="right"><?php echo number_format($plugin->getRatingAverage(), 1); ?></td>
+
+                        <td class="right"><?php echo number_format($plugin->getSupportThreadCount()); ?></td>
+                        <td class="right <?php echo $plugin->getSupportThreadCountUnresolved() > 0 ? 'negative' : 'positive' ?>">
+                            <?php echo number_format($plugin->getSupportThreadCountUnresolved()); ?>
+                        </td>
+                        <td>
+                            <a href="<?php echo $plugin->getSupportForumUrl(); ?>" target="_blank">Forum</a>
+                            <a href="<?php echo $plugin->getSupportFeedUrl(); ?>" target="_blank">RSS</a>
+                        </td>
+
+                        <td class="right">
+                            <a href="#translations-<?php echo $plugin->getSlug(); ?>">
+                                <?php echo number_format($plugin->getTranslationsCount())?>
+                            </a>
+                        </td>
+                        <td><a href="<?php echo $plugin->getTranslateUrl(); ?>" target="_blank">Translate</a></td>
+
+                        <td>
+                            <a href="<?php echo $plugin->getSvnUrl(); ?>" target="_blank">SVN</a>
+                            <a href="<?php echo $plugin->getTracUrl(); ?>" target="_blank">Trac</a>
+                            <a href="<?php echo $plugin->getTracFeedUrl(); ?>" target="_blank">RSS</a>
+                        </td>
+                    </tr>
+                    <?php } ?>
+               </tbody>
+            </table>
+            <script>
+                new Tablesort(document.getElementById('table-plugins'), {
+                    descending: true
+                });
+            </script>
+        </section>
+     <section>
+            <h2 id="translations">Translations (language packs)</h2>
+            <table id="table-translations">
+                <thead>
+                    <tr>
+                        <th scope="col">English name</th>
+                        <th scope="col">Native name</th>
+                        <th scope="col">Code</th>
+                        <?php foreach ($plugins as $plugin) { ?>
+                        <th scope="col" id="translations-<?php echo $plugin->getSlug(); ?>">
+                            <a href="<?php echo $plugin->getTranslateUrl(); ?>" target="_blank"><?php echo $plugin->getName(); ?></a>
+                            <?php echo $plugin->getVersion(); ?>
+                        <?php } ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($languages as $language => $names) { ?>
+                    <tr>
+                        <td><?php echo $names['english_name']; ?></td>
+                        <td><?php echo $names['native_name']; ?></td>
+                        <td><?php echo $language; ?></td>
+                        <?php foreach ($plugins as $plugin) {
+                            $translations = $plugin->getTranslations();
+                            $pluginVersion = $plugin->getVersion();
+                            if (array_key_exists($language, $translations)) {
+                                $translation = $translations[$language];
+                                $class = $pluginVersion === $translation['version'] ? 'latest' : 'old';
+                                $text = sprintf('<a href="%s" target="_blank">%s</a>', $translation['package'], $translation['version']);
+                            } else {
+                                $class = 'missing';
+                                $text = "&mdash;";
+                            } ?>
+                        <td class="<?php echo $class; ?>"><?php echo $text; ?></td>
+                        <?php } ?>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row" colspan="3">Number of language packs</th>
+                        <?php foreach ($plugins as $plugin) { ?>
+                        <th class="right"><?php echo number_format($plugin->getTranslationsCount()); ?></th>
+                        <?php } ?>
+                    </tr>
+                </tfoot>
+            </table>
+            <script>
+                new Tablesort(document.getElementById('table-translations'), {
+                    descending: true
+                });
+            </script>
+        </section>
+    </main>
+    <footer>
+        <p>A project by <a href="https://patrick-robrecht.de/">Patrick Robrecht</a>.
+            <a href="https://github.com/patrickrobrecht/wp-dev">Source Code</a> licensed unter GPL v3.</p>
+   </footer>
+    <!-- <?php echo sprintf('Generated in %s seconds.', number_format(microtime(true) - $startTime, 5)) ?> -->
 </body>
 </html>

@@ -7,12 +7,10 @@ const {parallel} = require('gulp');
 function copyJavaScriptLibraries() {
     return gulp.src(
         [
-            'node_modules/jquery/dist/jquery.min.*',
-            'node_modules/highcharts/highcharts.js*',
-            'node_modules/highcharts/modules/exporting.js*',
-            'node_modules/tablesorter/dist/js/jquery.tablesorter.min.js'
-        ])
-        .pipe(gulp.dest('js'));
+            'node_modules/tablesort/dist/tablesort.min.js',
+            'node_modules/tablesort/dist/sorts/tablesort.number.min.js'
+        ]
+    ).pipe(gulp.dest('js'));
 }
 
 function minify() {
