@@ -1,3 +1,4 @@
+const del = require('del');
 const gulp = require('gulp');
 const cleanCSS = require('gulp-clean-css');
 const minify = require('gulp-minify');
@@ -7,15 +8,17 @@ const sourcemaps = require('gulp-sourcemaps');
 const {parallel, series} = require('gulp');
 
 function copyJavaScriptLibraries() {
+    del('js/lib/*')
     return gulp.src(
         [
             'node_modules/tablesort/dist/tablesort.min.js',
             'node_modules/tablesort/dist/sorts/tablesort.number.min.js'
         ]
-    ).pipe(gulp.dest('js'));
+    ).pipe(gulp.dest('js/lib'));
 }
 
 function minifyCss() {
+    del('css/*.min.*')
     return gulp.src('css/style.css')
         .pipe(sourcemaps.init())
         .pipe(cleanCSS())

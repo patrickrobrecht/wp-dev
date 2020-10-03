@@ -1,5 +1,6 @@
 data/**/*.json
 css/*.min.css*
+js/lib/
 js/*.min.js
 node_modules/
 vendor/

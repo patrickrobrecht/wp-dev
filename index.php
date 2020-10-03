@@ -20,8 +20,8 @@ include_once __DIR__ . '/vendor/autoload.php';
     <meta charset="UTF-8">
     <title>WordPress Plugins Dashboard</title>
     <link rel="stylesheet" href="css/style.min.css">
-    <script src="js/tablesort.min.js"></script>
-    <script src="js/tablesort.number.min.js"></script>
+    <script src="js/lib/tablesort.min.js"></script>
+    <script src="js/lib/tablesort.number.min.js"></script>
 </head>
 <body>
     <header>
