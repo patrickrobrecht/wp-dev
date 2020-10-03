@@ -23,7 +23,7 @@ class WordPressApi
             $copied = copy($apiUrl, $filePath);
             $this->echoUpdateMessage('author', $author, $copied);
         }
-        return file_get_contents($filePath);
+        return @file_get_contents($filePath);
     }
 
     public function getPluginInfo(string $pluginSlug, $forceUpdate = false): string
@@ -31,10 +31,10 @@ class WordPressApi
         $filePath = $this->dataDirectory . '/plugins/' . $pluginSlug . '.json';
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/plugins/info/1.0/%s.json?fields=active_installs', $pluginSlug);
-            $copied = copy($apiUrl, $filePath);
+            $copied = @copy($apiUrl, $filePath);
             $this->echoUpdateMessage('plugin', $pluginSlug, $copied);
         }
-        return file_get_contents($filePath);
+        return @file_get_contents($filePath);
     }
 
     public function getPluginStats(string $pluginSlug, $forceUpdate = false): string
@@ -45,7 +45,7 @@ class WordPressApi
             $copied = copy($apiUrl, $filePath);
             $this->echoUpdateMessage('plugin stats', $pluginSlug, $copied);
         }
-        return file_get_contents($filePath);
+        return @file_get_contents($filePath);
     }
 
 
@@ -57,7 +57,7 @@ class WordPressApi
             $copied = copy($apiUrl, $filePath);
             $this->echoUpdateMessage('plugin translations', $pluginSlug, $copied);
         }
-        return file_get_contents($filePath);
+        return @file_get_contents($filePath);
     }
 
     private static function fileMissingOrOld(string $filePath): bool
@@ -79,7 +79,7 @@ class WordPressApi
         if ($copied) {
             $message = '<li><span class="success">Updated</span>: %s file for %s</li>';
         } else {
-            $message = '<li><span class="error">Error</span>: could not update %s file for %s</li>';
+            $message = '<li><span class="error">Error</span>: Could not update %s file for %s</li>';
         }
         echo sprintf($message, $type, $plugin);
     }

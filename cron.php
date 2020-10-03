@@ -14,7 +14,8 @@ use WordPressPluginDashboard\WordPressApi;
 // Update local cache with the latest data from the WordPress API.
 $wordPressApi = new WordPressApi(false);
 
-foreach ($plugins_cron_job as $pluginSlug) {
+global $pluginsForCronJob;
+foreach ($pluginsForCronJob as $pluginSlug) {
     $wordPressApi->getPluginInfo($pluginSlug, true);
     $wordPressApi->getPluginStats($pluginSlug, true);
     $wordPressApi->getPluginTranslations($pluginSlug, true);

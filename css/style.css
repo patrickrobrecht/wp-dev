@@ -4,24 +4,28 @@ body {
     font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
 }
 
-button {
+button.link {
     border: none;
     font: inherit;
     padding: unset;
     background: none;
 }
 
-a, button {
+a, button.link {
     text-decoration: none;
     border-bottom: 1px solid;
 }
 
-a:hover, a:focus, button:hover {
+a:hover, a:focus, button.link:hover {
     border-bottom: 1px solid #fff;
 }
 
 a[href^="#"]:after {
     content: " ↓";
+}
+
+h1 {
+    margin: 0;
 }
 
 h2 {
@@ -37,11 +41,6 @@ header, footer {
 
 header {
     padding: .5em;
-}
-
-header h1, header ul {
-    float: left;
-    margin: 0;
 }
 
 header, header a, footer, footer a {
@@ -163,7 +162,48 @@ th[role=columnheader]:not(.no-sort):hover:after {
     opacity: 1;
 }
 
+
 /* forms */
-form {
+#forms {
+    margin: auto;
+    width: 60%;
+}
+
+.hide {
+    display: none;
+}
+
+.column {
+    display: inline-block;
+    vertical-align: top;
+    width: 300px;
+}
+
+.column:first-child {
+    margin-right: 100px;
+}
+
+input[type="text"], button:not(.link) {
+    line-height: 1.5;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+input[type=text] {
+    height: calc(.75rem + 2px);
+    width: 280px;
+}
+
+button:not(.link) {
+    width: 100%;
+    margin: 10px auto;
+    display: block;
+    background: #1982d1;
+    color: #fff;
+    font-size: 1.2em;
+    border: none;
+}
+
+form.inline {
     display: inline;
 }

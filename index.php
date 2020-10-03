@@ -19,20 +19,13 @@ include_once __DIR__ . '/vendor/autoload.php';
 <head>
     <meta charset="UTF-8">
     <title>WordPress Plugins Dashboard</title>
-    <link rel="stylesheet" href="css/dist/style.css">
+    <link rel="stylesheet" href="css/style.min.css">
     <script src="js/tablesort.min.js"></script>
     <script src="js/tablesort.number.min.js"></script>
 </head>
 <body>
     <header>
         <h1><a href="./">WordPress Plugins Dashboard</a></h1>
-        <nav>
-            <ul>
-                <li><a href="#plugins">Plugins</a></li>
-                <li><a href="#translations">Translations</a></li>
-            </ul>
-        </nav>
-        <div id="clear-header"></div>
     </header>
     <main>
         <p>You can create your own dashboard by adding a parameter to the URL:</p>
@@ -48,52 +41,85 @@ $startTime = microtime(true);
 $wordPressApi = new WordPressApi(true);
 $regex = '@([a-z]|[0-9]|-|,)+@s';
 
-$pluginSlugs = $plugins_show_default;
-$customPlugins = false;
+$pluginSlugs = [];
 if (isset($_GET['author'])) {
-	$authorSlugFromRequest = strtolower($_GET['author']);
-	if (preg_match($regex, $authorSlugFromRequest)) {
-		$jsonFileContents = $wordPressApi->getAuthor($authorSlugFromRequest);
-		$json = json_decode($jsonFileContents, true);
-		if (isset($json['plugins'])) {
-			$pluginSlugs = array_map(
-				static function ($i) {
-					return $i['slug'];
-				},
-				$json['plugins']
-			);
-		}
-		$customPlugins = true;
-	}
+    $authorSlugFromRequest = strtolower($_GET['author']);
+    if (preg_match($regex, $authorSlugFromRequest)) {
+        $jsonFileContents = $wordPressApi->getAuthor($authorSlugFromRequest);
+        $json = json_decode($jsonFileContents, true);
+        if (isset($json['plugins'])) {
+            $pluginSlugs = array_map(
+                static function ($i) {
+                    return $i['slug'];
+                },
+                $json['plugins']
+            );
+        }
+    } else {
+        $authorSlugFromRequest = '';
+    }
 } elseif (isset($_GET['plugins'])) {
     $pluginSlugsFromRequest = strtolower($_GET['plugins']);
     if (preg_match($regex, $pluginSlugsFromRequest)) {
         $pluginSlugs = explode(',', $pluginSlugsFromRequest);
-        $customPlugins = true;
     }
 }
 
 if (isset($_POST['update']) && in_array($_POST['update'], $pluginSlugs, true)) {
-	$freshPluginSlug = $_POST['update'];
+    $freshPluginSlug = $_POST['update'];
 } else {
-	$freshPluginSlug = '';
+    $freshPluginSlug = '';
 }
 
 $languages = [];
 $plugins = [];
 foreach ($pluginSlugs as $pluginSlug) {
     $plugin = new Plugin($pluginSlug, $pluginSlug === $freshPluginSlug, $wordPressApi);
-    $plugins[] = $plugin;
-    foreach ($plugin->getTranslations() as $translation) {
-        $languages[$translation['language']] = [
-            'english_name' => $translation['english_name'],
-            'native_name'  => $translation['native_name'],
-        ];
+    if ($plugin->hasErrors()) {
+        echo sprintf('<li><span class="error">Error</span>: Plugin %s not found</li>', $pluginSlug);
+    } else {
+        $plugins[] = $plugin;
+        foreach ($plugin->getTranslations() as $translation) {
+            $languages[$translation['language']] = [
+                'english_name' => $translation['english_name'],
+                'native_name'  => $translation['native_name'],
+            ];
+        }
     }
 }
 asort($languages);
-?>
+
+$formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
         </ul>
+
+        <button id="toggle-button">Select plugins for your custom dashboard</button>
+        <section id="forms"<?php echo $formsClass; ?>>
+            <div class="column">
+                <label for="plugin-slug">Plugins (slugs from WordPress.org)</label>
+                <div id="plugin-inputs">
+                    <?php foreach ($pluginSlugs as $pluginSlug) { ?>
+                        <input type="text" name="plugin-slugs" value="<?php echo $pluginSlug; ?>" onchange="setPlugins()">
+                    <?php } ?>
+                    <input id="plugin-slug" type="text" name="plugin-slugs" onchange="setPlugins()">
+                </div>
+                <form method="get">
+                    <input id="plugin-slugs" name="plugins" type="hidden" value="<?php echo explode(',', $pluginSlugs); ?>">
+                    <button id="add-row" type="button">Add another plugin</button>
+                    <button>Show dashboard</button>
+                </form>
+                <template id="plugins-input-template">
+                    <input type="text" name="plugin-slugs" onchange="setPlugins()">
+                </template>
+            </div>
+
+            <form class="column" method="get">
+                <label for="author">Author (WordPress.org username)</label>
+                <input id="author" type="text" name="author" value="<?php echo $authorSlugFromRequest ?? ''; ?>">
+                <button>Show dashboard</button>
+            </form>
+        </section>
+
+<?php if (count($pluginSlugs) > 0) { ?>
         <section>
             <h2 id="plugins">Plugins</h2>
             <table id="table-plugins">
@@ -155,9 +181,9 @@ asort($languages);
                     <tr>
                         <td>
                             <a href="<?php echo $plugin->getPluginUrl(); ?>" target="_blank"><?php echo $plugin->getName(); ?></a>
-                            <form method="post">
+                            <form method="post" class="inline">
                                 <input name="update" type="hidden" value="<?php echo $plugin->getSlug(); ?>">
-                                <button type="submit">🔃</button>
+                                <button type="submit" class="link">🔃</button>
                             </form>
                         </td>
                         <td><?php echo str_replace('<a', '<a target="_blank"', $plugin->getAuthor()); ?></td>
@@ -207,13 +233,11 @@ asort($languages);
                     <?php } ?>
                </tbody>
             </table>
-            <script>
-                new Tablesort(document.getElementById('table-plugins'), {
-                    descending: true
-                });
-            </script>
         </section>
-     <section>
+<?php } ?>
+
+<?php if (count($languages) > 0) { ?>
+        <section>
             <h2 id="translations">Translations (language packs)</h2>
             <table id="table-translations">
                 <thead>
@@ -260,16 +284,16 @@ asort($languages);
                 </tfoot>
             </table>
             <script>
-                new Tablesort(document.getElementById('table-translations'), {
-                    descending: true
-                });
+
             </script>
         </section>
+<?php } ?>
     </main>
     <footer>
         <p>A project by <a href="https://patrick-robrecht.de/">Patrick Robrecht</a>.
             <a href="https://github.com/patrickrobrecht/wp-dev">Source Code</a> licensed unter GPL v3.</p>
    </footer>
     <!-- <?php echo sprintf('Generated in %s seconds.', number_format(microtime(true) - $startTime, 5)) ?> -->
+    <script src="js/functions.min.js"></script>
 </body>
 </html>

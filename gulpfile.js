@@ -1,8 +1,10 @@
 const gulp = require('gulp');
 const cleanCSS = require('gulp-clean-css');
+const minify = require('gulp-minify');
+const rename = require('gulp-rename');
 const sourcemaps = require('gulp-sourcemaps');
 
-const {parallel} = require('gulp');
+const {parallel, series} = require('gulp');
 
 function copyJavaScriptLibraries() {
     return gulp.src(
@@ -13,15 +15,27 @@ function copyJavaScriptLibraries() {
     ).pipe(gulp.dest('js'));
 }
 
-function minify() {
+function minifyCss() {
     return gulp.src('css/style.css')
         .pipe(sourcemaps.init())
         .pipe(cleanCSS())
+        .pipe(rename({extname: '.min.css'}))
         .pipe(sourcemaps.write('./', {
             mapFile: true
         }))
-        .pipe(gulp.dest('css/dist'));
+        .pipe(gulp.dest('css'));
 }
 
-exports.default = parallel(copyJavaScriptLibraries, minify);
-exports.build = minify;
+function minifyJavascript() {
+    return gulp.src('js/functions.js')
+        .pipe(minify({
+            ext: {
+                min: '.min.js'
+            },
+            noSource: true
+        }))
+        .pipe(gulp.dest('js'));
+}
+
+exports.default = parallel(copyJavaScriptLibraries, series(minifyCss, minifyJavascript));
+exports.build = series(minifyCss, minifyJavascript);

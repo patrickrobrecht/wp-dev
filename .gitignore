@@ -1,6 +1,6 @@
 data/**/*.json
-css/dist/
-js/
+css/*.min.css*
+js/*.min.js
 node_modules/
 vendor/
 config.php

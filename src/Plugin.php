@@ -4,6 +4,7 @@ namespace WordPressPluginDashboard;
 
 class Plugin
 {
+    private bool $errors = false;
     private $slug;
     private $infoJson;
     private $statsJson;
@@ -16,10 +17,19 @@ class Plugin
         $infoJson = $wordPressApi->getPluginInfo($slug, $force);
         $statsJson = $wordPressApi->getPluginStats($slug, $force);
         $translationsJson = $wordPressApi->getPluginTranslations($slug, $force);
+        
+        if (!$infoJson || !$statsJson || !$translationsJson) {
+            $this->errors = true;
+        }
 
         $this->infoJson = json_decode($infoJson, true);
         $this->statsJson = json_decode($statsJson, true);
         $this->translationsJson = json_decode($translationsJson, true);
+    }
+
+    public function hasErrors()
+    {
+        return $this->errors;
     }
 
     public function getActiveInstallsCount(): int
