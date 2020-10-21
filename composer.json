@@ -1,6 +1,6 @@
 {
   "name": "patrickrobrecht/wp-dev",
-  "description": "WordPress Plugins Overview",
+  "description": "WordPress Plugins Dashboard",
   "license": "GPL-3.0",
   "require": {
     "php": "^7.4",
