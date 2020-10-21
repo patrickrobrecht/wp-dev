@@ -12,7 +12,7 @@ include_once __DIR__ . '/vendor/autoload.php';
 use WordPressPluginDashboard\WordPressApi;
 
 // Update local cache with the latest data from the WordPress API.
-$wordPressApi = new WordPressApi(false);
+$wordPressApi = new WordPressApi();
 
 global $pluginsForCronJob;
 foreach ($pluginsForCronJob as $pluginSlug) {

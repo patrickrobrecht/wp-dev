@@ -5,12 +5,10 @@ namespace WordPressPluginDashboard;
 class WordPressApi
 {
     private string $dataDirectory;
-    private bool $outputMessages;
+    private array $messages = [];
 
-    public function __construct(bool $outputMessages)
+    public function __construct()
     {
-        $this->outputMessages = $outputMessages;
-
         global $dataDirectory;
         $this->dataDirectory = $dataDirectory;
     }
@@ -21,7 +19,7 @@ class WordPressApi
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/plugins/info/1.2/?action=query_plugins&request[author]=%s', $author);
             $copied = copy($apiUrl, $filePath);
-            $this->echoUpdateMessage('author', $author, $copied);
+            $this->addMessage('author', $author, $copied);
         }
         return @file_get_contents($filePath);
     }
@@ -32,7 +30,7 @@ class WordPressApi
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/plugins/info/1.0/%s.json?fields=active_installs', $pluginSlug);
             $copied = @copy($apiUrl, $filePath);
-            $this->echoUpdateMessage('plugin', $pluginSlug, $copied);
+            $this->addMessage('plugin', $pluginSlug, $copied);
         }
         return @file_get_contents($filePath);
     }
@@ -43,7 +41,7 @@ class WordPressApi
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/stats/plugin/1.0/%s', $pluginSlug);
             $copied = copy($apiUrl, $filePath);
-            $this->echoUpdateMessage('plugin stats', $pluginSlug, $copied);
+            $this->addMessage('plugin stats', $pluginSlug, $copied);
         }
         return @file_get_contents($filePath);
     }
@@ -55,7 +53,7 @@ class WordPressApi
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/translations/plugins/1.0/?slug=%s', $pluginSlug);
             $copied = copy($apiUrl, $filePath);
-            $this->echoUpdateMessage('plugin translations', $pluginSlug, $copied);
+            $this->addMessage('plugin translations', $pluginSlug, $copied);
         }
         return @file_get_contents($filePath);
     }
@@ -70,17 +68,27 @@ class WordPressApi
         return (date('U') - $lastChanged) > ( 24 * 60 * 60 );
     }
 
-    private function echoUpdateMessage(string $type, string $plugin, bool $copied): void
+    private function addMessage(string $type, string $plugin, bool $copied): void
     {
-        if (!$this->outputMessages) {
-            return;
-        }
-
         if ($copied) {
-            $message = '<li><span class="success">Updated</span>: %s file for %s</li>';
+            $this->messages[] = new Message('success', sprintf('Updated: %s file for %s', $type, $plugin));
         } else {
-            $message = '<li><span class="error">Error</span>: Could not update %s file for %s</li>';
+            $this->messages[] = new Message('error', sprintf('Error: Could not update %s file for %s', $type, $plugin));
         }
-        echo sprintf($message, $type, $plugin);
+    }
+
+    public function getMessages(): array
+    {
+        return $this->messages;
+    }
+
+    public function getWordPressCoreVersions()
+    {
+        $filePath = $this->dataDirectory . '/wordpress-core-versions.json';
+        if (self::fileMissingOrOld($filePath)) {
+            $apiUrl = 'https://api.wordpress.org/core/stable-check/1.0/';
+            copy($apiUrl, $filePath);
+        }
+        return @file_get_contents($filePath);
     }
 }

@@ -6,11 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Version 1.3.0 (2020-10-21)
+
+### Added
+- Add positive/negative indicators for last updated, compatibility with the latest WP version, average rating
+
+### Changed
+- Rename the `author` parameter to `authors` and allow multiple authors to be chosen
+- Refactor code (move logic from the main file and API class into controller class)
+
+
 ## Version 1.2.0 (2020-10-03)
 
 ### Added
 - Add commands for PSR-12 code style check
 - Add a form for creating a custom dashboard instead of default plugins
+- Allow to list all plugins of a WordPress.org user via the `author` parameter
 - Minify JavaScript
 
 ### Changed

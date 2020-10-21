@@ -8,11 +8,14 @@
  * @package wp-dev
  */
 
-use WordPressPluginDashboard\Plugin;
-use WordPressPluginDashboard\WordPressApi;
+use WordPressPluginDashboard\WordPressPluginDashboard;
 
 include_once __DIR__ . '/config.php';
 include_once __DIR__ . '/vendor/autoload.php';
+
+$startTime = microtime(true);
+$dashboard = new WordPressPluginDashboard();
+$formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -32,94 +35,64 @@ include_once __DIR__ . '/vendor/autoload.php';
         <ul>
             <li><code>/?plugins=s,s2</code> for WordPress plugin slugs <code>s</code>, <code>s2</code>
                 (as in <code>https://wordpress.org/plugins/s/</code>)</li>
-            <li>or <code>/?author=a</code> with <code>a</code> being a username on WordPress.org to list all the author's plugins.</li>
+            <li>or <code>/?authors=a,b</code> with <code>a</code>, <code>b</code>
+                being a username on WordPress.org to list all the author's plugins.</li>
         </ul>
+
         <ul id="messages">
-<?php
-$startTime = microtime(true);
-
-$wordPressApi = new WordPressApi(true);
-$regex = '@([a-z]|[0-9]|-|,)+@s';
-
-$pluginSlugs = [];
-if (isset($_GET['author'])) {
-    $authorSlugFromRequest = strtolower($_GET['author']);
-    if (preg_match($regex, $authorSlugFromRequest)) {
-        $jsonFileContents = $wordPressApi->getAuthor($authorSlugFromRequest);
-        $json = json_decode($jsonFileContents, true);
-        if (isset($json['plugins'])) {
-            $pluginSlugs = array_map(
-                static function ($i) {
-                    return $i['slug'];
-                },
-                $json['plugins']
-            );
-        }
-    } else {
-        $authorSlugFromRequest = '';
-    }
-} elseif (isset($_GET['plugins'])) {
-    $pluginSlugsFromRequest = strtolower($_GET['plugins']);
-    if (preg_match($regex, $pluginSlugsFromRequest)) {
-        $pluginSlugs = explode(',', $pluginSlugsFromRequest);
-    }
-}
-
-if (isset($_POST['update']) && in_array($_POST['update'], $pluginSlugs, true)) {
-    $freshPluginSlug = $_POST['update'];
-} else {
-    $freshPluginSlug = '';
-}
-
-$languages = [];
-$plugins = [];
-foreach ($pluginSlugs as $pluginSlug) {
-    $plugin = new Plugin($pluginSlug, $pluginSlug === $freshPluginSlug, $wordPressApi);
-    if ($plugin->hasErrors()) {
-        echo sprintf('<li><span class="error">Error</span>: Plugin %s not found</li>', $pluginSlug);
-    } else {
-        $plugins[] = $plugin;
-        foreach ($plugin->getTranslations() as $translation) {
-            $languages[$translation['language']] = [
-                'english_name' => $translation['english_name'],
-                'native_name'  => $translation['native_name'],
-            ];
-        }
-    }
-}
-asort($languages);
-
-$formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
+            <?php foreach ($dashboard->getMessages() as $message) { ?>
+                <li><span class="<?php echo $message->getClass(); ?>"><?php echo $message->getText(); ?></span></li>
+            <?php } ?>
         </ul>
 
         <button id="toggle-button">Select plugins for your custom dashboard</button>
         <section id="forms"<?php echo $formsClass; ?>>
-            <div class="column">
-                <label for="plugin-slug">Plugins (slugs from WordPress.org)</label>
-                <div id="plugin-inputs">
-                    <?php foreach ($pluginSlugs as $pluginSlug) { ?>
-                        <input type="text" name="plugin-slugs" value="<?php echo $pluginSlug; ?>" onchange="setPlugins()">
-                    <?php } ?>
-                    <input id="plugin-slug" type="text" name="plugin-slugs" onchange="setPlugins()">
+            <div class="columns full-width">
+                <div class="column">
+                    <div id="plugin-inputs">
+                        <label for="plugin-slugs">Plugins (slugs from WordPress.org)</label>
+                        <?php foreach ($dashboard->getPluginSlugs() as $pluginSlug) { ?>
+                            <input class="slug-input" type="text" name="plugin-slugs" value="<?php echo $pluginSlug; ?>">
+                        <?php } ?>
+                        <input class="slug-input" type="text" name="plugin-slugs">
+                    </div>
+                    <button class="add-row" type="button"
+                            data-container="plugin-inputs"
+                            data-template="plugins-input-template">
+                        Add another plugin
+                    </button>
+                    <template id="plugins-input-template">
+                        <input class="slug-input" type="text" name="plugin-slugs">
+                    </template>
                 </div>
-                <form method="get">
-                    <input id="plugin-slugs" name="plugins" type="hidden" value="<?php echo explode(',', $pluginSlugs); ?>">
-                    <button id="add-row" type="button">Add another plugin</button>
-                    <button>Show dashboard</button>
-                </form>
-                <template id="plugins-input-template">
-                    <input type="text" name="plugin-slugs" onchange="setPlugins()">
-                </template>
+
+                <div class="column">
+                    <div id="author-inputs">
+                        <label for="author-slugs">Author (WordPress.org username)</label>
+                        <?php foreach ($dashboard->getAuthorSlugs() as $authorSlug) { ?>
+                            <input class="slug-input" type="text" name="author-slugs" value="<?php echo $authorSlug; ?>">
+                        <?php } ?>
+                        <input class="slug-input" type="text" name="author-slugs">
+                    </div>
+                    <button class="add-row" type="button"
+                            data-container="author-inputs"
+                            data-template="author-input-template">
+                        Add another author
+                    </button>
+                    <template id="author-input-template">
+                        <input class="slug-input" type="text" name="author-slugs" value="">
+                    </template>
+                </div>
             </div>
 
-            <form class="column" method="get">
-                <label for="author">Author (WordPress.org username)</label>
-                <input id="author" type="text" name="author" value="<?php echo $authorSlugFromRequest ?? ''; ?>">
+            <form method="get" class="full-width">
+                <input id="plugin-slugs" name="plugins" type="hidden" value="<?php echo implode(',', $dashboard->getPluginSlugs()); ?>">
+                <input id="author-slugs" name="authors" type="hidden" value="<?php echo implode(',', $dashboard->getAuthorSlugs()); ?>">
                 <button>Show dashboard</button>
             </form>
         </section>
 
-<?php if (count($pluginSlugs) > 0) { ?>
+<?php if (count($dashboard->getPlugins()) > 0) { ?>
         <section>
             <h2 id="plugins">Plugins</h2>
             <table id="table-plugins">
@@ -172,10 +145,38 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($plugins as $plugin) {
+                    <?php foreach ($dashboard->getPlugins() as $plugin) {
+                        $timeSinceLastUpdate = date_diff($plugin->getLastUpdated(), date_create());
+                        $updatedInLastYear = $timeSinceLastUpdate->y < 1;
+                        if ($updatedInLastYear) {
+                            $lastUpdateTimeDescription = sprintf('%d days ago', $timeSinceLastUpdate->days);
+                        } else {
+                            $lastUpdateTimeDescription = sprintf(
+                                '%d %s %d %s ago',
+                                $timeSinceLastUpdate->y,
+                                $timeSinceLastUpdate->y === 1 ? 'year' : 'years',
+                                $timeSinceLastUpdate->m,
+                                $timeSinceLastUpdate->m === 1 ? 'month' : 'months',
+                            );
+                        }
+                        $lastUpdateTitle = date_format($plugin->getLastUpdated(), 'd.m.Y H:i:s') . ', ' . $lastUpdateTimeDescription;
+
                         $versionInfo = [];
                         foreach ($plugin->getVersionStats() as $version => $count) {
                             $versionInfo[] = sprintf('%.2f %% on %s.x', $count, $version);
+                        }
+
+                        $isCompatibleWithLatestWordPressVersion = version_compare(
+                            $plugin->getMaxWordPressVersion(),
+                            $dashboard->getLatestWordPressVersion(),
+                            ">="
+                        );
+
+                        $averageRating = $plugin->getRatingAverage();
+                        if ($averageRating >= 4) {
+                            $averageRatingClass = 'positive';
+                        } elseif ($averageRating <= 2) {
+                            $averageRatingClass = 'negative';
                         }
                         ?>
                     <tr>
@@ -187,9 +188,10 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
                             </form>
                         </td>
                         <td><?php echo str_replace('<a', '<a target="_blank"', $plugin->getAuthor()); ?></td>
-                        <td data-sort="<?php echo date('U', $plugin->getLastUpdated()); ?>">
-                            <time title="<?php echo date('Y-m-d H:i:s', $plugin->getLastUpdated()); ?>">
-                                <?php echo date('d.m.Y', $plugin->getLastUpdated()); ?>
+                        <td class="<?php echo $updatedInLastYear ? 'positive' : 'negative' ?>"
+                            data-sort="<?php echo date_format($plugin->getLastUpdated(), 'U'); ?>">
+                            <time title="<?php echo $lastUpdateTitle; ?>">
+                                <?php echo date_format($plugin->getLastUpdated(), 'd.m.Y'); ?>
                             </time>
                         </td>
                         <td class="right"><?php echo number_format($plugin->getActiveInstallsCount()); ?>+</td>
@@ -199,14 +201,18 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
                         <td><?php echo implode('<br>', $versionInfo); ?></td>
 
                         <td><?php echo $plugin->getMinWordPressVersion() ?: 'unknown'; ?></td>
-                        <td><?php echo $plugin->getMaxWordPressVersion() ?: 'unknown'; ?></td>
+                        <td class="<?php echo $isCompatibleWithLatestWordPressVersion ? 'positive' : 'negative'; ?>">
+                            <?php echo $plugin->getMaxWordPressVersion() ?: 'unknown'; ?>
+                        </td>
                         <td><?php echo $plugin->getMinPhpVersion() ?: 'unknown'; ?></td>
 
                         <td class="right"><?php echo number_format($plugin->getRatingCount()); ?></td>
                         <?php foreach (range(1, 5) as $i) { ?>
                             <td class="right"><?php echo number_format($plugin->getRatings($i)); ?></td>
                         <?php } ?>
-                        <td class="right"><?php echo number_format($plugin->getRatingAverage(), 1); ?></td>
+                        <td class="right<?php echo $averageRatingClass ? ' ' . $averageRatingClass : ''; ?>">
+                            <?php echo number_format($averageRating, 1); ?>
+                        </td>
 
                         <td class="right"><?php echo number_format($plugin->getSupportThreadCount()); ?></td>
                         <td class="right <?php echo $plugin->getSupportThreadCountUnresolved() > 0 ? 'negative' : 'positive' ?>">
@@ -236,7 +242,7 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
         </section>
 <?php } ?>
 
-<?php if (count($languages) > 0) { ?>
+<?php if (count($dashboard->getLanguages()) > 0) { ?>
         <section>
             <h2 id="translations">Translations (language packs)</h2>
             <table id="table-translations">
@@ -245,7 +251,7 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
                         <th scope="col">English name</th>
                         <th scope="col">Native name</th>
                         <th scope="col">Code</th>
-                        <?php foreach ($plugins as $plugin) { ?>
+                        <?php foreach ($dashboard->getPlugins() as $plugin) { ?>
                         <th scope="col" id="translations-<?php echo $plugin->getSlug(); ?>">
                             <a href="<?php echo $plugin->getTranslateUrl(); ?>" target="_blank"><?php echo $plugin->getName(); ?></a>
                             <?php echo $plugin->getVersion(); ?>
@@ -253,20 +259,20 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($languages as $language => $names) { ?>
+                    <?php foreach ($dashboard->getLanguages() as $language) { ?>
                     <tr>
-                        <td><?php echo $names['english_name']; ?></td>
-                        <td><?php echo $names['native_name']; ?></td>
-                        <td><?php echo $language; ?></td>
-                        <?php foreach ($plugins as $plugin) {
+                        <td><?php echo $language->getEnglishName(); ?></td>
+                        <td><?php echo $language->getNativeName(); ?></td>
+                        <td><?php echo $language->getLocaleCode(); ?></td>
+                        <?php foreach ($dashboard->getPlugins() as $plugin) {
                             $translations = $plugin->getTranslations();
                             $pluginVersion = $plugin->getVersion();
-                            if (array_key_exists($language, $translations)) {
-                                $translation = $translations[$language];
-                                $class = $pluginVersion === $translation['version'] ? 'latest' : 'old';
+                            if (array_key_exists($language->getLocaleCode(), $translations)) {
+                                $translation = $translations[$language->getLocaleCode()];
+                                $class = $pluginVersion === $translation['version'] ? 'positive' : 'negative';
                                 $text = sprintf('<a href="%s" target="_blank">%s</a>', $translation['package'], $translation['version']);
                             } else {
-                                $class = 'missing';
+                                $class = 'negative';
                                 $text = "&mdash;";
                             } ?>
                         <td class="<?php echo $class; ?>"><?php echo $text; ?></td>
@@ -277,8 +283,8 @@ $formsClass = count($plugins) > 0 ? ' class="hide"' : ''; ?>
                 <tfoot>
                     <tr>
                         <th scope="row" colspan="3">Number of language packs</th>
-                        <?php foreach ($plugins as $plugin) { ?>
-                        <th class="right"><?php echo number_format($plugin->getTranslationsCount()); ?></th>
+                        <?php foreach ($dashboard->getPlugins() as $plugin) { ?>
+                            <th class="right"><?php echo number_format($plugin->getTranslationsCount()); ?></th>
                         <?php } ?>
                     </tr>
                 </tfoot>

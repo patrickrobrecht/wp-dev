@@ -115,19 +115,15 @@ th[colspan] {
     text-align: right;
 }
 
-.latest, .positive {
+.positive {
     background: #46b450 !important;
 }
 
-.old {
-    background: #f1adad !important;
-}
-
-.missing, .negative {
+.negative {
     background: #dc3232 !important;
 }
 
-.latest a, .old a, .missing {
+.negative a, .negative {
     color: #fff;
 }
 
@@ -166,32 +162,52 @@ th[role=columnheader]:not(.no-sort):hover:after {
 /* forms */
 #forms {
     margin: auto;
-    width: 60%;
 }
 
 .hide {
     display: none;
 }
 
-.column {
-    display: inline-block;
-    vertical-align: top;
-    width: 300px;
+.full-width {
+    width: 100%;
 }
 
-.column:first-child {
-    margin-right: 100px;
+@media (min-width: 768px) {
+    #forms {
+        width: 80%;
+    }
+
+    .columns {
+        display: flex;
+    }
+
+    .column {
+        flex: 50%;
+    }
+
+    .column:first-child {
+        padding-right: 50px;
+    }
+}
+
+@media (min-width: 1200px) {
+    #forms {
+        width: 60%;
+    }
+}
+
+label {
+    font-weight: bolder;
+}
+
+input[type="text"] {
+    width: 90%;
 }
 
 input[type="text"], button:not(.link) {
-    line-height: 1.5;
     padding: 10px;
+    line-height: 1.5;
     margin-top: 10px;
-}
-
-input[type=text] {
-    height: calc(.75rem + 2px);
-    width: 280px;
 }
 
 button:not(.link) {

@@ -10,20 +10,25 @@ toggleButton.onclick = function () {
 /**
  * Add row mechanism.
  */
-let inputContainer = document.getElementById('plugin-inputs')
-let addRowButton = document.getElementById('add-row');
-let template = document.getElementById('plugins-input-template');
-addRowButton.onclick = function () {
-    let row = document.importNode(template.content, true);
-    inputContainer.appendChild(row);
-};
+for (let addRowButton of document.getElementsByClassName('add-row')) {
+    addRowButton.onclick = function (event) {
+        let button = event.target;
+        let template = document.getElementById(button.getAttribute('data-template'));
+        let container = document.getElementById(button.getAttribute('data-container'));
+        let newRow = document.importNode(template.content, true);
+        newRow.children.item(0).onchange = updateHiddenInput;
+        container.appendChild(newRow);
+    };
+}
 
-/**
- * Update plugin list in the hidden field.
- */
-function setPlugins() {
-    let inputs = document.getElementsByName('plugin-slugs');
-    document.getElementById('plugin-slugs').value = Array.from(inputs).map(i => i.value).filter(i => i !== '').join(',');
+for (let slugInput of document.getElementsByClassName('slug-input')) {
+    slugInput.onchange = updateHiddenInput;
+}
+
+function updateHiddenInput(event) {
+    let input = event.target;
+    let allInputs = document.getElementsByName(input.name);
+    document.getElementById(input.name).value = Array.from(allInputs).map(i => i.value).filter(i => i !== '').join(',');
 }
 
 /**

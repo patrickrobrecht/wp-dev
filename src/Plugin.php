@@ -69,7 +69,7 @@ class Plugin
 
     public function getLastUpdated()
     {
-        return strtotime($this->infoJson['last_updated']);
+        return date_create($this->infoJson['last_updated']);
     }
 
     public function getName(): string
@@ -84,6 +84,9 @@ class Plugin
 
     public function getRatingAverage(): float
     {
+        if ($this->getRatingCount() <= 0) {
+            return 0;
+        }
         $sum = 0;
         foreach (range(1, 5) as $stars) {
             $sum += $this->getRatings($stars) * $stars;
