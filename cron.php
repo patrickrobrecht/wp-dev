@@ -20,3 +20,8 @@ foreach ($pluginsForCronJob as $pluginSlug) {
     $wordPressApi->getPluginStats($pluginSlug, true);
     $wordPressApi->getPluginTranslations($pluginSlug, true);
 }
+
+global $authorsForCronJob;
+foreach ($authorsForCronJob as $authorSlug) {
+    $wordPressApi->getAuthor($authorSlug, true);
+}

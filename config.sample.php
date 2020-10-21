@@ -17,4 +17,8 @@ $pluginsForCronJob = [
     'extended-evaluation-for-statify',
     'posts-and-users-stats',
 ];
-sort($pluginsForCronJob);
+
+// List of authors to include in the cron job.
+$authorsForCronJob = [
+    'patrickrobrecht',
+];

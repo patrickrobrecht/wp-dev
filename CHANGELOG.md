@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add positive/negative indicators for last updated, compatibility with the latest WP version, average rating
+- Add cron job to update authors specified in the configuration file
 
 ### Changed
 - Rename the `author` parameter to `authors` and allow multiple authors to be chosen
