@@ -51,8 +51,8 @@
 	Header set X-Frame-Options "deny"
 	Header set X-XSS-Protection "1; mode=block"
 
-	Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
-	Header set Feature-Policy "vibrate 'none'"
+	Header set Content-Security-Policy "default-src 'self'"
+	Header set Permissions-Policy "geolocation=()"
 	Header set Referrer-Policy same-origin
 
 	# Remove server information

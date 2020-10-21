@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Rename the `author` parameter to `authors` and allow multiple authors to be chosen
 - Refactor code (move logic from the main file and API class into controller class)
+- Improve security headers (no inline scripts or styles required anymore!)
 
 
 ## Version 1.2.0 (2020-10-03)

@@ -23,8 +23,6 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
     <meta charset="UTF-8">
     <title>WordPress Plugins Dashboard</title>
     <link rel="stylesheet" href="css/style.min.css">
-    <script src="js/lib/tablesort.min.js"></script>
-    <script src="js/lib/tablesort.number.min.js"></script>
 </head>
 <body>
     <header>
@@ -289,9 +287,6 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                     </tr>
                 </tfoot>
             </table>
-            <script>
-
-            </script>
         </section>
 <?php } ?>
     </main>
@@ -300,6 +295,8 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
             <a href="https://github.com/patrickrobrecht/wp-dev">Source Code</a> licensed unter GPL v3.</p>
    </footer>
     <!-- <?php echo sprintf('Generated in %s seconds.', number_format(microtime(true) - $startTime, 5)) ?> -->
+    <script src="js/lib/tablesort.min.js"></script>
+    <script src="js/lib/tablesort.number.min.js"></script>
     <script src="js/functions.min.js"></script>
 </body>
 </html>
