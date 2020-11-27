@@ -1,4 +1,4 @@
-data/**/*.json
+data/
 css/*.min.css*
 js/lib/
 js/*.min.js

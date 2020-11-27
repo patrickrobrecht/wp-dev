@@ -2,32 +2,48 @@
 
 namespace WordPressPluginDashboard;
 
+use DateInterval;
+use DateTime;
+use JsonException;
+use SimpleXMLElement;
+
 class Plugin
 {
     private bool $errors = false;
-    private $slug;
+    private string $slug;
     private $infoJson;
     private $statsJson;
     private $translationsJson;
+    private $reviewsXml;
 
     public function __construct(string $slug, bool $force, WordPressApi $wordPressApi)
     {
         $this->slug = $slug;
 
         $infoJson = $wordPressApi->getPluginInfo($slug, $force);
+        $reviewXml = $wordPressApi->getPluginReviews($slug, $force);
         $statsJson = $wordPressApi->getPluginStats($slug, $force);
         $translationsJson = $wordPressApi->getPluginTranslations($slug, $force);
-        
-        if (!$infoJson || !$statsJson || !$translationsJson) {
+
+        if (!$infoJson || !$reviewXml || !$statsJson || !$translationsJson) {
             $this->errors = true;
         }
 
-        $this->infoJson = json_decode($infoJson, true);
-        $this->statsJson = json_decode($statsJson, true);
-        $this->translationsJson = json_decode($translationsJson, true);
+        try {
+            $this->infoJson = json_decode($infoJson, true, 512, JSON_THROW_ON_ERROR);
+            $this->statsJson = json_decode($statsJson, true, 512, JSON_THROW_ON_ERROR);
+            $this->translationsJson = json_decode($translationsJson, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            $this->errors = true;
+        }
+
+        $this->reviewsXml = @simplexml_load_string($reviewXml);
+        if (!$this->reviewsXml) {
+            $this->errors = true;
+        }
     }
 
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return $this->errors;
     }
@@ -103,6 +119,49 @@ class Plugin
     {
 
         return (int) $this->infoJson['ratings'][$stars];
+    }
+
+    public function getBadReviewsNotAnswered(): int
+    {
+        $reviewsCount = 0;
+        $sixMonthsAgo = (new DateTime())->sub(new DateInterval('P6M'));
+
+        foreach ($this->reviewsXml->xpath('channel/item') as $item) {
+            $date = self::getFirstElement($item, 'pubDate');
+            $description = self::getFirstElement($item, 'description');
+            if ($date && $description) {
+                $date = DateTime::createFromFormat(DateTime::RSS, $date[0]);
+
+                if ($date < $sixMonthsAgo) {
+                    continue;
+                }
+
+                $descriptionHtml = @simplexml_load_string('<html lang="en">' . $description->__toString() . '</html>');
+                $paragraphs = $descriptionHtml->xpath('p');
+                foreach ($paragraphs as $paragraph) {
+                    if (strpos($paragraph, 'Replies') !== false) {
+                        $replies = (int) trim(str_replace('Replies:', '', $paragraph->__toString()));
+                    } elseif (strpos($paragraph, 'Rating') !== false) {
+                        $rating = (int) trim(str_replace(['Rating:', 'stars'], '', $paragraph->__toString()));
+                    }
+                }
+
+                if (isset($replies, $rating) && $rating <= 2 && $replies === 0) {
+                    $reviewsCount++;
+                }
+            }
+        }
+
+        return $reviewsCount;
+    }
+
+    private static function getFirstElement(SimpleXMLElement $xmlElement, string $path): ?SimpleXMLElement
+    {
+        $results = $xmlElement->xpath($path);
+        if (count($results) >= 0) {
+            return $results[0];
+        }
+        return null;
     }
 
     public function getSupportThreadCount(): int

@@ -35,6 +35,17 @@ class WordPressApi
         return @file_get_contents($filePath);
     }
 
+    public function getPluginReviews(string $pluginSlug, $forceUpdate = false): string
+    {
+        $filePath = $this->dataDirectory . '/reviews/' . $pluginSlug . '.xml';
+        if ($forceUpdate || self::fileMissingOrOld($filePath)) {
+            $apiUrl = sprintf('https://wordpress.org/support/plugin/%s/reviews/feed/', $pluginSlug);
+            $copied = copy($apiUrl, $filePath);
+            $this->addMessage('plugin reviews', $pluginSlug, $copied);
+        }
+        return @file_get_contents($filePath);
+    }
+
     public function getPluginStats(string $pluginSlug, $forceUpdate = false): string
     {
         $filePath = $this->dataDirectory . '/stats/' . $pluginSlug . '.json';

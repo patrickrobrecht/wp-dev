@@ -99,7 +99,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                         <th colspan="5">General information</th>
                         <th colspan="2">Versions</th>
                         <th colspan="3">Compatibility</th>
-                        <th colspan="7">Ratings</th>
+                        <th colspan="8">Ratings</th>
                         <th colspan="3">Support</th>
                         <th colspan="2">Translations</th>
                         <th>Development</th>
@@ -131,6 +131,11 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                         <th scope="col" role="columnheader"><abbr title="number of 4 star ratings">4★</abbr></th>
                         <th scope="col" role="columnheader"><abbr title="number of 5 star ratings">5★</abbr></th>
                         <th scope="col" role="columnheader"><abbr title="average rating">⌀</abbr></th>
+                        <th scope="col" role="columnheader">
+                            <abbr title="unanswered bad reviews from last six months (maximum last 30 reviews)">
+                                1-2★ no answer
+                            </abbr>
+                        </th>
 
                         <th scope="col" role="columnheader">threads</th>
                         <th scope="col" role="columnheader">threads unresolved</th>
@@ -176,6 +181,8 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                         } elseif ($averageRating <= 2) {
                             $averageRatingClass = 'negative';
                         }
+
+                        $badReviewsNotAnswered = $plugin->getBadReviewsNotAnswered();
                         ?>
                     <tr>
                         <td>
@@ -210,6 +217,9 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                         <?php } ?>
                         <td class="right<?php echo $averageRatingClass ? ' ' . $averageRatingClass : ''; ?>">
                             <?php echo number_format($averageRating, 1); ?>
+                        </td>
+                        <td class="right <?php echo $badReviewsNotAnswered > 0 ? 'negative' : 'positive'; ?>">
+                            <?php echo number_format($badReviewsNotAnswered); ?>
                         </td>
 
                         <td class="right"><?php echo number_format($plugin->getSupportThreadCount()); ?></td>

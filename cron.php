@@ -16,6 +16,7 @@ $directories = [
     $dataDirectory,
     $dataDirectory . '/authors',
     $dataDirectory . '/plugins',
+    $dataDirectory . '/reviews',
     $dataDirectory . '/stats',
     $dataDirectory . '/translations',
 ];
@@ -31,6 +32,7 @@ $wordPressApi = new WordPressApi();
 global $pluginsForCronJob;
 foreach ($pluginsForCronJob as $pluginSlug) {
     $wordPressApi->getPluginInfo($pluginSlug, true);
+    $wordPressApi->getPluginReviews($pluginSlug, true);
     $wordPressApi->getPluginStats($pluginSlug, true);
     $wordPressApi->getPluginTranslations($pluginSlug, true);
 }
