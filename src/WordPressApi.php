@@ -37,7 +37,7 @@ class WordPressApi
 
     public function getPluginStats(string $pluginSlug, $forceUpdate = false): string
     {
-        $filePath = $this->dataDirectory . '/plugins-stats/' . $pluginSlug . '.json';
+        $filePath = $this->dataDirectory . '/stats/' . $pluginSlug . '.json';
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/stats/plugin/1.0/%s', $pluginSlug);
             $copied = copy($apiUrl, $filePath);
@@ -49,7 +49,7 @@ class WordPressApi
 
     public function getPluginTranslations(string $pluginSlug, $forceUpdate = false): string
     {
-        $filePath = $this->dataDirectory . '/plugins-translations/' . $pluginSlug . '.json';
+        $filePath = $this->dataDirectory . '/translations/' . $pluginSlug . '.json';
         if ($forceUpdate || self::fileMissingOrOld($filePath)) {
             $apiUrl = sprintf('https://api.wordpress.org/translations/plugins/1.0/?slug=%s', $pluginSlug);
             $copied = copy($apiUrl, $filePath);

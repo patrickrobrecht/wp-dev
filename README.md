@@ -22,6 +22,7 @@ You can add the following GET parameters to https://wp-dev.patrick-robrecht.de/ 
 - Edit `config.php` to define the data directory (and optionally the plugins/authors to be updated by the cronjob).
 - Copy all files to your server running PHP.
 - Create a daily cron-job for `cron.php` (recommended, but optional).
+    To create the data directories, cron.php needs to be started once.
 
 ## How to develop
 Required: Composer and npm

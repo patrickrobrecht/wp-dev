@@ -11,6 +11,20 @@ include_once __DIR__ . '/vendor/autoload.php';
 
 use WordPressPluginDashboard\WordPressApi;
 
+// Create required directories.
+$directories = [
+    $dataDirectory,
+    $dataDirectory . '/authors',
+    $dataDirectory . '/plugins',
+    $dataDirectory . '/stats',
+    $dataDirectory . '/translations',
+];
+foreach ($directories as $directory) {
+    if (!is_dir($directory) && !mkdir($directory, 0775) && !is_dir($directory)) {
+        throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
+    }
+}
+
 // Update local cache with the latest data from the WordPress API.
 $wordPressApi = new WordPressApi();
 
