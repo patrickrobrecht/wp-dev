@@ -3,7 +3,7 @@
   "description": "WordPress Plugins Dashboard",
   "license": "GPL-3.0",
   "require": {
-    "php": "^7.4",
+    "php": "^8.0",
     "ext-json": "*",
     "ext-simplexml": "*"
   },
