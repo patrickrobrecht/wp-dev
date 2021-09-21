@@ -6,9 +6,8 @@
     "gulp-clean-css": "^4.3.0",
     "gulp-minify": "^3.1.0",
     "gulp-rename": "^2.0.0",
-    "gulp-sourcemaps": "^2.6.5",
-    "tablesort": "^5.2.1",
-    "yargs-parser": "^20.2.3"
+    "gulp-sourcemaps": "^3.0.0",
+    "tablesort": "^5.2.1"
   },
   "scripts": {
     "postinstall": "gulp",
