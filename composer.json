@@ -8,7 +8,6 @@
     "ext-simplexml": "*"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
     "squizlabs/php_codesniffer": "^3.7"
   },
   "scripts": {
@@ -25,6 +24,11 @@
   "autoload": {
     "psr-4": {
       "WordPressPluginDashboard\\": "src/"
+    }
+  },
+  "config": {
+    "audit": {
+      "abandoned": "fail"
     }
   }
 }
