@@ -1,8 +1,6 @@
-css/*.min.css*
-data/
-js/lib/
-js/*.min.js*
-node_modules/
-vendor/
+/assets/
+/data/
+/node_modules/
+/vendor/
+.rnd
 config.php
-mix-manifest.json
