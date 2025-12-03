@@ -2,8 +2,6 @@
 
 /**
  * Cron job for updating the data from wordpress.org.
- *
- * @package wp-dev
  */
 
 include_once __DIR__ . '/config.php';

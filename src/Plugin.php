@@ -117,7 +117,6 @@ class Plugin
 
     public function getRatings(int $stars): int
     {
-
         return (int) $this->infoJson['ratings'][$stars];
     }
 

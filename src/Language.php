@@ -15,25 +15,16 @@ class Language
         $this->nativeName = $nativeName;
     }
 
-    /**
-     * @return string
-     */
     public function getLocaleCode(): string
     {
         return $this->localeCode;
     }
 
-    /**
-     * @return string
-     */
     public function getEnglishName(): string
     {
         return $this->englishName;
     }
 
-    /**
-     * @return string
-     */
     public function getNativeName(): string
     {
         return $this->nativeName;

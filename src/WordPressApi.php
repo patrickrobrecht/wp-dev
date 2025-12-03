@@ -57,7 +57,6 @@ class WordPressApi
         return @file_get_contents($filePath);
     }
 
-
     public function getPluginTranslations(string $pluginSlug, $forceUpdate = false): string
     {
         $filePath = $this->dataDirectory . '/translations/' . $pluginSlug . '.json';
@@ -76,7 +75,7 @@ class WordPressApi
         }
 
         $lastChanged = filemtime($filePath);
-        return (date('U') - $lastChanged) > ( 24 * 60 * 60 );
+        return (date('U') - $lastChanged) > (24 * 60 * 60);
     }
 
     private function addMessage(string $type, string $plugin, bool $copied): void

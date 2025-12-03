@@ -4,7 +4,6 @@
  * Configuration file:
  * Define the list of plugins shown by default and included in the cron job here.
  *
- * @package wp-dev
  * @since 1.0
  */
 

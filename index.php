@@ -4,8 +4,6 @@
  * Dashboard about plugins from the WordPress.org Plugin Directory.
  * The page displays general information on the plugin, installed versions and ratings as well as
  * available translations via translate.wordpress.org.
- *
- * @package wp-dev
  */
 
 use WordPressPluginDashboard\WordPressPluginDashboard;
@@ -172,7 +170,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                         $isCompatibleWithLatestWordPressVersion = version_compare(
                             $plugin->getMaxWordPressVersion(),
                             $dashboard->getLatestWordPressVersion(),
-                            ">="
+                            '>='
                         );
 
                         $averageRating = $plugin->getRatingAverage();
@@ -193,7 +191,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                             </form>
                         </td>
                         <td><?php echo str_replace('<a', '<a target="_blank"', $plugin->getAuthor()); ?></td>
-                        <td class="<?php echo $updatedInLastYear ? 'positive' : 'negative' ?>"
+                        <td class="<?php echo $updatedInLastYear ? 'positive' : 'negative'; ?>"
                             data-sort="<?php echo date_format($plugin->getLastUpdated(), 'U'); ?>">
                             <time title="<?php echo $lastUpdateTitle; ?>">
                                 <?php echo date_format($plugin->getLastUpdated(), 'd.m.Y'); ?>
@@ -223,7 +221,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                         </td>
 
                         <td class="right"><?php echo number_format($plugin->getSupportThreadCount()); ?></td>
-                        <td class="right <?php echo $plugin->getSupportThreadCountUnresolved() > 0 ? 'negative' : 'positive' ?>">
+                        <td class="right <?php echo $plugin->getSupportThreadCountUnresolved() > 0 ? 'negative' : 'positive'; ?>">
                             <?php echo number_format($plugin->getSupportThreadCountUnresolved()); ?>
                         </td>
                         <td>
@@ -233,7 +231,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
 
                         <td class="right">
                             <a href="#translations-<?php echo $plugin->getSlug(); ?>">
-                                <?php echo number_format($plugin->getTranslationsCount())?>
+                                <?php echo number_format($plugin->getTranslationsCount()); ?>
                             </a>
                         </td>
                         <td><a href="<?php echo $plugin->getTranslateUrl(); ?>" target="_blank">Translate</a></td>
@@ -281,7 +279,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                                 $text = sprintf('<a href="%s" target="_blank">%s</a>', $translation['package'], $translation['version']);
                             } else {
                                 $class = 'negative';
-                                $text = "&mdash;";
+                                $text = '&mdash;';
                             } ?>
                         <td class="<?php echo $class; ?>"><?php echo $text; ?></td>
                         <?php } ?>
@@ -304,7 +302,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
         <p>A project by <a href="https://patrick-robrecht.de/">Patrick Robrecht</a>.
             <a href="https://github.com/patrickrobrecht/wp-dev">Source Code</a> licensed unter GPL v3.</p>
    </footer>
-    <!-- <?php echo sprintf('Generated in %s seconds.', number_format(microtime(true) - $startTime, 5)) ?> -->
+    <!-- <?php echo sprintf('Generated in %s seconds.', number_format(microtime(true) - $startTime, 5)); ?> -->
     <script src="assets/js/lib/tablesort.min.js"></script>
     <script src="assets/js/lib/tablesort.number.min.js"></script>
     <script src="assets/js/functions.min.js"></script>
