@@ -197,7 +197,7 @@ $formsClass = count($dashboard->getPlugins()) > 0 ? ' class="hide"' : '';
                                 <?php echo date_format($plugin->getLastUpdated(), 'd.m.Y'); ?>
                             </time>
                         </td>
-                        <td class="right"><?php echo number_format($plugin->getActiveInstallsCount()); ?>+</td>
+                        <td class="right" data-sort="<?php echo $plugin->getActiveInstallsCount(); ?>">><?php echo number_format($plugin->getActiveInstallsCount()); ?>+</td>
                         <td class="right"><?php echo number_format($plugin->getDownloadCount()); ?></td>
 
                         <td><a href="<?php echo $plugin->getDownloadUrl(); ?>" target="_blank"><?php echo $plugin->getVersion(); ?></a></td>
