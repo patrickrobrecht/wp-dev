@@ -23,11 +23,17 @@ export default defineConfig({
             targets: [
                 {
                     src: 'node_modules/tablesort/dist/tablesort.min.js',
-                    dest: 'js/lib'
+                    dest: 'js/lib',
+                    rename: {
+                        stripBase: true,
+                    }
                 },
                 {
                     src: 'node_modules/tablesort/dist/sorts/tablesort.number.min.js',
-                    dest: 'js/lib'
+                    dest: 'js/lib',
+                    rename: {
+                        stripBase: true,
+                    }
                 }
             ]
         })
